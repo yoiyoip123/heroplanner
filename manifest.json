@@ -1,0 +1,20 @@
+{
+  "name": "바르셀로나 & 포르투 여행 플래너",
+  "short_name": "여행플래너",
+  "description": "하이리 & 웅희의 스페인·포르투갈 여행 일정",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f5f2",
+  "theme_color": "#e63946",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
