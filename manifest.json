@@ -6,12 +6,12 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f6f5f2",
-  "theme_color": "#e63946",
+  "background_color": "#fbf7f2",
+  "theme_color": "#f6b57e",
   "lang": "ko",
   "icons": [
     {
-      "src": "icon.svg",
+      "src": "hero.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

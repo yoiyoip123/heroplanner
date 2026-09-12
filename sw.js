@@ -1,10 +1,10 @@
 // 여행 플래너 서비스워커 - 오프라인에서도 앱이 열리게 함
-const CACHE = 'travel-planner-v1';
+const CACHE = 'travel-planner-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './hero.svg'
 ];
 
 // 설치: 핵심 파일 캐시

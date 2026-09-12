@@ -7,12 +7,13 @@
 
 <!-- PWA: 홈 화면 앱 -->
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#e63946" />
+<meta name="theme-color" content="#ff9db0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="여행플래너" />
-<link rel="apple-touch-icon" href="icon.svg" />
-<link rel="icon" type="image/svg+xml" href="icon.svg" />
+<link rel="apple-touch-icon" href="hero.svg" />
+<link rel="icon" type="image/svg+xml" href="hero.svg" />
+<link rel="icon" href="hero.svg" sizes="any" />
 
 <!-- 실시간 공동수정용 Supabase 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -27,16 +28,16 @@
 </script>
 <style>
   :root {
-    --bcn: #e63946;
-    --bcn-soft: #fff0f0;
-    --porto: #1d6a96;
-    --porto-soft: #eaf4fa;
-    --ink: #2b2b33;
-    --muted: #6b6b76;
-    --line: #e7e7ee;
-    --bg: #f6f5f2;
+    --bcn: #e07856;        /* 부드러운 테라코타 코랄 */
+    --bcn-soft: #fdf1ec;
+    --porto: #3a7ca5;      /* 차분한 지중해 블루 */
+    --porto-soft: #eef5fa;
+    --ink: #3a3540;
+    --muted: #7c7688;
+    --line: #ece7ef;
+    --bg: #fbf7f2;         /* 따뜻한 아이보리 */
     --card: #ffffff;
-    --gold: #d4a017;
+    --gold: #e0a94a;       /* 골든 아워 */
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -50,18 +51,62 @@
   }
   a { color: inherit; }
 
-  /* HERO */
+  /* HERO — 포르투 노을 (핑크빛 하늘 + 도루강 + 언덕 위 집들) */
   .hero {
-    background: linear-gradient(135deg, #e63946 0%, #c1121f 45%, #1d6a96 100%);
+    background:
+      linear-gradient(180deg,
+        #ffb0c4 0%,      /* 핑크빛 하늘 */
+        #ff9db0 18%,
+        #ffb27e 42%,     /* 살구 노을 */
+        #ffd9a0 62%,     /* 강 위 금빛 */
+        #f4a9a0 100%);   /* 물빛 반사 */
     color: #fff;
-    padding: 54px 22px 46px;
+    padding: 64px 22px 90px;
     text-align: center;
     position: relative;
+    overflow: hidden;
   }
-  .hero h1 { margin: 0 0 6px; font-size: 2rem; letter-spacing: -0.5px; }
-  .hero .dates { font-size: 1.05rem; opacity: 0.95; font-weight: 500; }
-  .hero .sub { margin-top: 14px; font-size: 0.9rem; opacity: 0.85; }
-  .flags { font-size: 1.6rem; margin-bottom: 10px; }
+  /* 노을 구름 + 지는 해 */
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(120px 120px at 50% 34%, rgba(255,249,230,0.95) 0%, rgba(255,231,170,0.5) 45%, rgba(255,231,170,0) 72%),
+      radial-gradient(200px 60px at 22% 20%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 70%),
+      radial-gradient(240px 70px at 78% 28%, rgba(255,214,224,0.4) 0%, rgba(255,214,224,0) 70%);
+    pointer-events: none;
+  }
+  /* 언덕 위 알록달록 집들 실루엣 (하단) + 강물 */
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 62px;
+    background:
+      /* 집들: 작은 사각형들이 계단식으로 */
+      repeating-linear-gradient(90deg,
+        rgba(214,120,110,0.55) 0 10px,
+        rgba(232,158,118,0.55) 10px 20px,
+        rgba(200,110,120,0.55) 20px 30px,
+        rgba(238,180,120,0.55) 30px 40px),
+      linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(120,90,120,0.35) 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0 55%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0 55%, transparent 100%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero h1 {
+    margin: 0 0 6px; font-size: 2rem; letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(120,60,70,0.35);
+  }
+  .hero .dates { font-size: 1.05rem; font-weight: 600; text-shadow: 0 1px 6px rgba(90,60,40,0.22); }
+  .hero .sub {
+    display: inline-block; margin-top: 14px; font-size: 0.86rem;
+    background: rgba(255,255,255,0.22); padding: 5px 14px; border-radius: 999px;
+    backdrop-filter: blur(2px);
+  }
+  .flags { font-size: 1.7rem; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(90,60,40,0.2)); }
 
   /* NAV */
   nav {
