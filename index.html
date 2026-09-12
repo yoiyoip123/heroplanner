@@ -170,6 +170,15 @@
   .t-title { font-weight: 600; }
   .t-desc { font-size: 0.86rem; color: var(--muted); margin-top: 1px; }
   .t-emoji { margin-right: 5px; }
+  /* 이동 구간 표시 */
+  .timeline li.move { padding: 4px 0; border-top: none; }
+  .timeline li.move .t-time { color: transparent; }
+  .move-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.76rem; color: var(--muted);
+    background: var(--bg); border: 1px dashed var(--line);
+    padding: 2px 10px; border-radius: 999px;
+  }
 
   .flight {
     background: linear-gradient(90deg, #fff8e6, #fff); border: 1px solid #f0e2b8;
@@ -429,34 +438,46 @@
   <div class="day">
     <div class="day-head"><span class="day-date">9/24 목</span><span class="day-tag">도착 · 나 혼자</span></div>
     <ul class="timeline">
-      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 도착 &amp; 호텔 체크인</div><div class="t-desc">공항 → Arcelon Hotel. 공항철도(R2 Nord) 또는 Aerobus + 택시. 짐 풀고 휴식.</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚶</span>동네 산책 &amp; 가볍게 저녁</div><div class="t-desc">시차 적응 겸 무리하지 않기. 근처 타파스 바에서 저녁 + 일찍 취침.</div></div></li>
+      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 공항 도착</div><div class="t-desc">입국 심사 + 짐 찾기.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚆 공항→호텔 · 약 40~50분 (R2 Nord 기차 또는 Aerobus+택시)</span></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏨</span>Arcelon Hotel 체크인 &amp; 휴식</div><div class="t-desc">짐 풀고 잠깐 쉬기.</div></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚶</span>동네 산책 &amp; 가볍게 저녁</div><div class="t-desc">시차 적응 겸 무리하지 않기. 근처 타파스 바 + 일찍 취침. ⏱️ 1~2시간</div></div></li>
     </ul>
   </div>
 
   <div class="day">
-    <div class="day-head"><span class="day-date">9/25 금</span><span class="day-tag">웅희 합류 🎉</span></div>
+    <div class="day-head"><span class="day-date">9/25 금</span><span class="day-tag">웅희 합류 🎉 · 구시가지</span></div>
     <ul class="timeline">
-      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">☕</span>고딕 지구 &amp; 람블라스 거리</div><div class="t-desc">웅희 도착 전 여유롭게. 바르셀로나 대성당, 보케리아 시장 구경.</div></div></li>
-      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🤝</span>웅희 도착 &amp; 합류</div><div class="t-desc">호텔에서 만나 짐 정리 후 함께 출발.</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍷</span>재회 기념 저녁 + 상그리아</div><div class="t-desc">엘 보른(El Born) 지역 추천 — 분위기 좋은 타파스 골목.</div></div></li>
+      <li><span class="t-time">10:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">☕</span>고딕 지구 여유롭게 (혼자)</div><div class="t-desc">웅희 오기 전 카페 + 람블라스 거리 산책. ⏱️ ~12:00</div></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🤝</span>웅희 도착 &amp; 합류</div><div class="t-desc">호텔에서 만나 짐 정리 후 함께 출발. (웅희 도착 시간 맞춰 조정)</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 호텔→고딕지구 · 약 20분 (지하철)</span></div></li>
+      <li><span class="t-time">15:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>바르셀로나 대성당 (Catedral)</div><div class="t-desc">고딕 지구 중심. 옥상 전망 + 회랑의 거위들. ⏱️ ~16:00 (1시간) · 💶 €9~11</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Cathedral+of+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 대성당→보케리아 · 도보 약 10분</span></div></li>
+      <li><span class="t-time">16:15</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍓</span>라 보케리아 시장 (La Boqueria)</div><div class="t-desc">람블라스 옆 재래시장. 생과일주스·하몽·간식. ⏱️ ~17:00 (40분) · 💶 무료(먹거리 별도)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Mercat+de+la+Boqueria+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 보케리아→피카소미술관(보른) · 도보 약 15분</span></div></li>
+      <li><span class="t-time">17:30</span><div class="t-body"><div class="t-title"><span class="t-emoji">🎨</span>피카소 미술관 (El Born)</div><div class="t-desc">목요일 저녁 무료입장 시간대 있음(확인). ⏱️ ~19:00 (1.5시간) · 💶 €12~14 (목 오후 무료 가능)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Picasso+Museum+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">19:30</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍷</span>재회 기념 저녁 + 상그리아</div><div class="t-desc">보른 지구 타파스 골목. 미술관에서 도보 5분 내.</div></div></li>
     </ul>
   </div>
 
   <div class="day">
     <div class="day-head"><span class="day-date">9/26 토</span><span class="day-tag">가우디 데이</span></div>
     <ul class="timeline">
-      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏛️</span>구엘 공원 (Park Güell)</div><div class="t-desc">오전 일찍 예약 권장. 사진 명소. ※ 사그라다 파밀리아 본 방문은 10/1 저녁으로 예약되어 있음.</div></div></li>
-      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏠</span>카사 바트요 / 카사 밀라 (그라시아 거리)</div><div class="t-desc">가우디 건축 산책 + 쇼핑. 파세이그 데 그라시아 명품 거리.</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛲</span>몬주익 매직 분수 쇼</div><div class="t-desc">주말 저녁 분수+조명 쇼 (시즌 시간 확인). 무료.</div></div></li>
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏛️</span>구엘 공원 (Park Güell)</div><div class="t-desc">오전 일찍 예약 권장. 모자이크 도마뱀 + 파노라마 뷰. ⏱️ 약 1.5시간 · 💶 €10 (사전예약 필수)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Park+Guell+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏠</span>카사 바트요 &amp; 카사 밀라 (그라시아 거리)</div><div class="t-desc">가우디 건축 두 곳 연달아. 파세이그 데 그라시아 쇼핑. ⏱️ 각 약 1시간 · 💶 카사 바트요 €29~39 / 카사 밀라 €28~</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Casa+Batllo+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏛️</span>개선문 (Arc de Triomf)</div><div class="t-desc">붉은 벽돌 개선문 + 시우타데야 공원. 사진만 찍고 지나가기 좋음. ⏱️ 약 20분 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Arc+de+Triomf+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">늦오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏰</span>몬주익 성 &amp; 카탈루냐 미술관 (MNAC)</div><div class="t-desc">몬주익 언덕(케이블카 추천). 성에서 항구 전망 → MNAC 웅장한 건물 &amp; 카탈루냐 미술. ⏱️ 성 1h + MNAC 1.5~2h · 💶 몬주익 성 €12 / MNAC €12(+옥상 €2)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Montjuic+Castle+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛲</span>몬주익 마법의 분수 쇼</div><div class="t-desc">MNAC 바로 앞. 주말 저녁 분수+조명+음악 쇼(시즌 시간 확인). ⏱️ 약 30분 · 💶 무료. 몬주익 일정과 딱 이어져요.</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Magic+Fountain+of+Montjuic" target="_blank">📍 지도</a></div></li>
     </ul>
   </div>
 
   <div class="day">
-    <div class="day-head"><span class="day-date">9/27 일</span><span class="day-tag">🏖️ 시체스 해변</span></div>
+    <div class="day-head"><span class="day-date">9/27 일</span><span class="day-tag">⚽ 캄 노우 + 🏖️ 시체스</span></div>
+    <p class="section-note" style="padding:0 18px;margin:4px 0 0;">※ 캄 노우는 시체스행 기차역(Sants) 근처예요. 오전에 캄 노우 → 바로 기차로 시체스行 하면 동선이 딱 맞아요. 축구에 관심 없으면 캄 노우는 건너뛰고 시체스에서 더 여유롭게!</p>
     <ul class="timeline">
-      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚆</span>시체스(Sitges)로 출발</div><div class="t-desc">Rodalies R2 Sud 또는 Passeig de Gràcia역에서 직행 기차. 약 40분, 편도 €4~6. 20~30분 간격 운행.</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Sitges+Beach+Spain" target="_blank">📍 지도</a></div></li>
-      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏖️</span>시체스 해변 &amp; 구시가지</div><div class="t-desc">해변 휴식, 산 바르토메우 성당 앞 포토존, 해산물 점심.</div></div></li>
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">⚽</span>캄 노우 (Camp Nou / FC 바르셀로나) <span style="font-size:.75rem;color:var(--muted);">(선택)</span></div><div class="t-desc">스타디움 투어 + 박물관. Sants역·시체스행 기차와 가까워 오전에 보기 좋음. ⏱️ 약 2시간 · 💶 투어 €28~ · ⚠️ 리모델링 상황·운영시간 방문 전 확인</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Camp+Nou+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚆</span>시체스(Sitges)로 출발</div><div class="t-desc">Sants 또는 Passeig de Gràcia역에서 직행 기차(R2 Sud). ⏱️ 약 40분 · 💶 편도 €4~6, 20~30분 간격</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Sitges+Beach+Spain" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏖️</span>시체스 해변 &amp; 구시가지</div><div class="t-desc">해변 휴식, 산 바르토메우 성당 앞 포토존, 해산물 점심. ⏱️ 반나절 · 💶 해변 무료</div></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌅</span>바르셀로나 복귀</div><div class="t-desc">해질녘 기차로 복귀. 짐 정리(다음날 포르투行 대비).</div></div></li>
     </ul>
   </div>
@@ -466,7 +487,9 @@
     <ul class="timeline">
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🧳</span>체크아웃 &amp; 공항 이동</div><div class="t-desc">Arcelon Hotel 체크아웃. 국제선 기준 최소 2시간 전 공항 도착 권장 → 14:00쯤 공항.</div></div></li>
       <li><span class="t-time">16:45</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 → 포르투 출발</div><div class="t-desc">약 2시간 비행 (시차 -1시간, 포르투가 1시간 느림).</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚇</span>포르투 도착 &amp; 체크인</div><div class="t-desc">공항 메트로 E선(보라색) → Trindade, 약 30분 €2.25. chic&amp;basic Gravity 체크인 후 히베이라 야경 산책.</div></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚇</span>포르투 도착 &amp; 체크인</div><div class="t-desc">공항 메트로 E선(보라색) → Trindade, 약 30분 €2.25. chic&amp;basic Gravity 체크인. ⏱️ 도착~체크인 약 1시간</div></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🫒</span>올리브 테이스팅 (Fábrica do Azeite)</div><div class="t-desc">시내 다운타운, 숙소 근처. '세계 최고 올리브오일숍' 수상. 저녁 늦게까지 여는 편이라 도착 첫날 가볍게 시음 + 하몽/치즈 보드 저녁. ⏱️ 약 1시간 · 💶 시음 옵션별 상이(오일 구매 추천)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Fabrica+do+Azeite+Porto" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">밤</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌉</span>동 루이스 1세 다리 야경</div><div class="t-desc">첫날 밤 마무리. 다리 위층에서 도루강 &amp; 히베이라 불빛 야경. ⏱️ 약 30~40분 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Dom+Luis+I+Bridge+Porto" target="_blank">📍 지도</a></div></li>
     </ul>
   </div>
 
@@ -477,7 +500,7 @@
   <div class="day porto-day">
     <div class="day-head"><span class="day-date">9/29 월</span><span class="day-tag">🍷 도루 밸리</span></div>
     <ul class="timeline">
-      <li><span class="t-time">종일</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍇</span>Douro Valley Wine 투어 (예약함)</div><div class="t-desc">테라스 포도밭 + 와이너리(퀸타) 시음 + 두오루 강변 드라이브. 보통 08:30~09:00 픽업, 저녁 복귀. 종일 소요.</div></div></li>
+      <li><span class="t-time">종일</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍇</span>Douro Valley Wine 투어 <span style="color:var(--bcn);font-weight:700;">(예약 필요!)</span></div><div class="t-desc">테라스 포도밭 + 와이너리(퀸타) 시음 + 두오루 강변 드라이브. 보통 08:30~09:00 픽업, 저녁 복귀. ⚠️ 아직 예약 안 함 — 인기 많으니 미리 예약! ⏱️ 종일(9~10시간) · 💶 투어 상품별 €80~130대(점심·시음 포함 많음)</div></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>가이아 강변 저녁</div><div class="t-desc">Vila Nova de Gaia에서 동 루이스 다리 야경 보며 저녁.</div></div></li>
     </ul>
   </div>
@@ -485,11 +508,12 @@
   <div class="day porto-day">
     <div class="day-head"><span class="day-date">9/30 화</span><span class="day-tag">📚 포르투 시내</span></div>
     <ul class="timeline">
-      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">📚</span>Livraria Lello (렐루 서점, 예약함)</div><div class="t-desc">개장 직후 방문 권장(줄 김). 입장권은 책 구매 시 할인. 해리포터 영감 서점.</div></div></li>
-      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>클레리구스 탑 &amp; 카르무 성당</div><div class="t-desc">렐루 바로 옆. 탑 전망 + 아줄레주(파란 타일) 외벽.</div></div></li>
-      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚉</span>상 벤투 역 &amp; 볼량 시장</div><div class="t-desc">상 벤투 역의 아줄레주 벽화(꼭 봐야 할 명소!) + 볼량 시장에서 현지 간식.</div></div></li>
-      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌉</span>히베이라 &amp; 동 루이스 1세 다리</div><div class="t-desc">강변 알록달록 구시가(유네스코). 다리 위층 도보 횡단 → 가이아쪽 전망대(Miradouro).</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍷</span>포트와인 셀러 시음</div><div class="t-desc">가이아쪽 Graham's / Sandeman 등 포트와인 저장고 투어.</div></div></li>
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">📚</span>Livraria Lello (렐루 서점, 예약함)</div><div class="t-desc">개장 직후 방문 권장(줄 김). 해리포터 영감 서점. ⏱️ 약 30~45분 · 💶 €8 (책 구매 시 차감)</div></div></li>
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>클레리구스 탑 &amp; 카르무 성당</div><div class="t-desc">렐루 바로 옆. 탑 전망 + 아줄레주 외벽. ⏱️ 약 40분 · 💶 탑 €8~ / 카르무 무료(외관)</div></div></li>
+      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚉</span>상 벤투 역 &amp; 볼량 시장</div><div class="t-desc">상 벤투 역 아줄레주 벽화(꼭 보기!) + 볼량 시장 현지 간식·점심. ⏱️ 약 1시간 · 💶 무료(시장 먹거리 별도)</div></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌉</span>히베이라 → 동 루이스 다리 건너 가이아</div><div class="t-desc">강변 알록달록 구시가(유네스코) 산책 후 다리 도보 횡단. ⏱️ 산책 약 45분 · 💶 무료</div></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍇</span>WOW (World of Wine) 복합문화공간</div><div class="t-desc">가이아 언덕. 와인·초콜릿·코르크 테마 박물관 + 포트와인 시음 + 파노라마 테라스. ⏱️ 반나절(3~5h) · 💶 지구 입장 €5, Day Pass 약 €25~40(박물관 수 선택). 시간 여유 있게!</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=WOW+World+of+Wine+Porto" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌇</span>세하 두 필라르 수도원 야경</div><div class="t-desc">WOW 바로 근처(도보). 포르투 시가지 + 동 루이스 다리 최고의 노을·야경 스팟. ⏱️ 약 30분 · 💶 전망대 무료 / 내부 €5</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Mosteiro+da+Serra+do+Pilar+Porto" target="_blank">📍 지도</a></div></li>
     </ul>
   </div>
 
@@ -499,7 +523,7 @@
       <li><span class="t-time">아침</span><div class="t-body"><div class="t-title"><span class="t-emoji">🧳</span>체크아웃 &amp; 공항 이동</div><div class="t-desc">이른 아침 체크아웃. 메트로 E선으로 공항. 늦어도 10:00 도착.</div></div></li>
       <li><span class="t-time">12:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>포르투 → 바르셀로나 출발</div><div class="t-desc">약 2시간 비행 + 시차 +1시간 → 바르셀로나 대략 15:00 도착.</div></div></li>
       <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏨</span>Arcelon Hotel 재체크인</div><div class="t-desc">공항 → 호텔 짐 두고 사그라다 파밀리아로 이동. ⚠️ 지연 대비 여유 필수.</div></div></li>
-      <li><span class="t-time">18:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>사그라다 파밀리아 (예약함!)</div><div class="t-desc">시간지정 입장 — 시간 엄수! 여권/QR 준비. 노을빛 스테인드글라스가 특히 아름다운 시간대.</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Sagrada+Familia+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">18:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>사그라다 파밀리아 (예약함!)</div><div class="t-desc">시간지정 입장 — 시간 엄수! 여권/QR 준비. 노을빛 스테인드글라스가 특히 아름다운 시간대. ⏱️ 약 1~1.5시간 · 💶 €26~34 (타워 포함 €47)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Sagrada+Familia+Barcelona" target="_blank">📍 지도</a></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>마지막 밤 저녁</div><div class="t-desc">그라시아 지구에서 여행 마무리 디너.</div></div></li>
     </ul>
   </div>
@@ -519,7 +543,7 @@
   <div class="tip">
     <b>💡 포르투 추가 추천</b> — 일정 여유 있을 때 골라 넣기 좋은 곳:
     <ul style="margin:6px 0 0;padding-left:20px;font-size:.86rem;color:var(--muted);">
-      <li><b>Aveiro &amp; Costa Nova 몰리세이루 보트 투어</b> (예약함) — '포르투갈의 베네치아' 운하 보트 + 알록달록 줄무늬 집. 반나절~하루. 시내 여유 있는 날(9/30 오전)에 배치하거나 별도 데이투어로.</li>
+      <li><b>Aveiro &amp; Costa Nova 몰리세이루 보트 투어</b> (예약함) — '포르투갈의 베네치아' 운하 보트 + 알록달록 줄무늬 집. 반나절~하루. 별도 데이투어로 잡거나, 9/30 WOW 대신 아베이루로 바꾸는 것도 방법!</li>
       <li>Palácio da Bolsa (증권거래소 궁전) — 화려한 아랍의 방</li>
       <li>Jardins do Palácio de Cristal — 강 전망 정원</li>
       <li>Foz do Douro / Matosinhos — 대서양 해변 &amp; 해산물</li>
@@ -927,12 +951,12 @@
         a: '🚣 아베이루 & 코스타 노바 몰리세이루 보트 투어예요.\n\n• "포르투갈의 베네치아" 운하 보트 + 알록달록 줄무늬 집\n• 반나절~하루 소요\n• 현재 9/30 시내 일정이 꽉 차 있어서, 원하면 9/30을 아베이루 데이투어로 바꾸고 시내는 다른 시간에 분산할 수 있어요. 조정 원하면 말해줘요!'
       },
       {
-        keys: ['포르투 명소','포르투 뭐','포르투 추천','포르투 볼','포르투 가볼','상벤투','상 벤투','볼사','크리스탈','마제스틱','히베이라','동 루이스','가이아'],
-        a: '📍 포르투 추천 명소:\n\n• 상 벤투 역 아줄레주(파란 타일) 벽화 — 꼭 보기!\n• 히베이라 & 동 루이스 1세 다리 야경\n• 포트와인 셀러(가이아쪽 Graham\'s / Sandeman)\n• 팔라시우 다 볼사(증권거래소 궁전)\n• 크리스탈 궁전 정원, 포스 두 도루 해변\n• 마제스틱 카페(1920년대 벨 에포크)'
+        keys: ['포르투 명소','포르투 뭐','포르투 추천','포르투 볼','포르투 가볼','상벤투','상 벤투','볼사','크리스탈','마제스틱','히베이라','동 루이스','가이아','wow','올리브','필라르','야경'],
+        a: '📍 포르투 일정 명소:\n\n• 9/28 저녁 — 올리브 테이스팅(Fábrica do Azeite) → 동 루이스 다리 야경\n• 9/29 — 도루밸리 와인투어(종일)\n• 9/30 — (오전)렐루서점·클레리구스탑·상벤투역 → (오후)히베이라 → WOW 복합문화공간(반나절) → 세하 두 필라르 수도원 야경\n\n※ WOW는 가이아 언덕 반나절 코스라 오후를 통으로 썼어요. 세하 두 필라르가 야경 최고 스팟!'
       },
       {
-        keys: ['바르셀로나 명소','바르셀로나 뭐','바르셀로나 추천','구엘','구엘공원','카사','몬주익','고딕','람블라스','park guell'],
-        a: '📍 바르셀로나 일정 명소:\n\n• 9/26 가우디 데이 — 구엘 공원, 카사 바트요/밀라, 몬주익 분수쇼\n• 고딕 지구 & 람블라스 거리, 보케리아 시장\n• 사그라다 파밀리아(10/1 18시 예약)\n• 구엘 공원도 사전 예약 권장!'
+        keys: ['바르셀로나 명소','바르셀로나 뭐','바르셀로나 추천','구엘','구엘공원','카사','몬주익','고딕','람블라스','park guell','캄노우','캄 노우','camp nou','피카소','보케리아','대성당','개선문','mnac','미술관'],
+        a: '📍 바르셀로나 일정 명소:\n\n• 9/25 — 대성당 → 라 보케리아 시장 → 피카소 미술관 (고딕/보른)\n• 9/26 가우디&몬주익 — 구엘 공원 → 카사 바트요/밀라 → 개선문 → 몬주익 성 → 카탈루냐 미술관(MNAC) → 마법의 분수 쇼\n• 9/27 — 캄 노우(오전, 선택) → 시체스 해변\n• 10/1 18시 — 사그라다 파밀리아(예약함)\n\n※ 구엘 공원·카사 바트요·사그라다는 사전 예약 필수! 캄노우는 리모델링 상황 확인.'
       },
       {
         keys: ['호텔','숙소','묵','체크인','체크아웃','arcelon','gravity'],
