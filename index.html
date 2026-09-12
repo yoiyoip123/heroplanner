@@ -19,8 +19,8 @@
 <script>
   // ▼▼▼ 여기 3줄만 본인 Supabase 값으로 채우면 실시간 공동수정이 켜져요 ▼▼▼
   window.TRIP_SYNC = {
-    SUPABASE_URL: "",      // 예: https://xxxx.supabase.co
-    SUPABASE_ANON_KEY: "", // 예: eyJhbGciOi... (anon public key)
+    SUPABASE_URL: "https://usrjysamvlqptjbpwydi.supabase.co",
+    SUPABASE_ANON_KEY: "sb_publishable_8NgfOn2HPPxFzeXZR5u6Ug_K2jqwX5M",
     ROOM: "hero-barcelona-porto"  // 하이리·웅희가 같은 값이면 같은 일정 공유 (안 바꿔도 됨)
   };
   // ▲▲▲ 값이 비어 있으면 예전처럼 각자 저장 + 파일공유 방식으로 동작해요 ▲▲▲
@@ -331,6 +331,7 @@
 <div class="edit-bar">
   <span class="who">👤 <b id="whoName">이름 없음</b></span>
   <button class="btn ghost" id="setName">이름 설정</button>
+  <span id="syncDot" style="font-size:.72rem;font-weight:600;">⚪ 로컬 저장</span>
   <span class="spacer"></span>
   <button class="btn" id="editToggle">✏️ 편집 켜기</button>
   <button class="btn" id="exportBtn">📤 내보내기</button>
@@ -610,6 +611,79 @@
     const LS_MEMOS = 'trip-memos-v1';   // [ {id, who, text} ]
     const LS_NAME  = 'trip-name-v1';
 
+    // ===== 실시간 클라우드 동기화 (Supabase) =====
+    const CFG = window.TRIP_SYNC || {};
+    const CLOUD_ON = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase);
+    let sb = null, applyingRemote = false, pushTimer = null;
+    if (CLOUD_ON) {
+      try {
+        sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, {
+          realtime: { params: { eventsPerSecond: 5 } }
+        });
+      } catch(e){ console.warn('Supabase init 실패', e); }
+    }
+
+    // 현재 상태(edits/memos/checks)를 한 덩어리로 모으기
+    function snapshot(){
+      let edits = {}; try { edits = JSON.parse(localStorage.getItem(LS_EDITS)||'{}'); } catch(e){}
+      const checks = {};
+      document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=>{ checks['trip-check-'+i] = b.checked ? '1':'0'; });
+      let memos = []; try { memos = JSON.parse(localStorage.getItem(LS_MEMOS)||'[]'); } catch(e){}
+      return { edits, memos, checks };
+    }
+
+    // 클라우드에 저장 (디바운스)
+    function cloudPush(){
+      if (!sb || applyingRemote) return;
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(async ()=>{
+        const data = snapshot();
+        const { error } = await sb.from('trips').upsert({
+          room: CFG.ROOM, data, updated_at: new Date().toISOString()
+        }, { onConflict: 'room' });
+        if (error) { console.warn('cloud push 오류', error); toast('동기화 오류 (설정 확인)'); }
+        else { cloudDot(true); }
+      }, 400);
+    }
+
+    // 클라우드에서 받은 상태를 화면/로컬에 반영
+    function applyCloud(data){
+      if (!data) return;
+      applyingRemote = true;
+      try {
+        if (data.edits){ localStorage.setItem(LS_EDITS, JSON.stringify(data.edits)); loadEdits(); }
+        if (Array.isArray(data.memos)){ localStorage.setItem(LS_MEMOS, JSON.stringify(data.memos)); renderMemos(); }
+        if (data.checks){
+          document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=>{
+            const v = data.checks['trip-check-'+i];
+            if (v !== undefined){ b.checked = v==='1'; localStorage.setItem('trip-check-'+i, v); b.nextElementSibling.classList.toggle('done', b.checked); }
+          });
+        }
+      } finally { applyingRemote = false; }
+    }
+
+    async function cloudInit(){
+      if (!sb) return;
+      // 최초 1회: 서버 상태 불러오기
+      const { data, error } = await sb.from('trips').select('data').eq('room', CFG.ROOM).maybeSingle();
+      if (!error && data && data.data) applyCloud(data.data);
+      else if (!error) cloudPush(); // 방이 없으면 내 현재 상태로 생성
+      // 실시간 구독: 다른 사람이 바꾸면 즉시 반영
+      sb.channel('trip-'+CFG.ROOM)
+        .on('postgres_changes', { event:'*', schema:'public', table:'trips', filter:'room=eq.'+CFG.ROOM },
+          payload => { if (payload.new && payload.new.data) applyCloud(payload.new.data); cloudDot(true); })
+        .subscribe();
+      cloudDot(true);
+    }
+
+    // 상단 동기화 표시등
+    function cloudDot(ok){
+      const el = document.getElementById('syncDot');
+      if (!el) return;
+      el.textContent = CLOUD_ON ? (ok ? '🟢 실시간 동기화 중' : '🟡 연결 중…') : '⚪ 로컬 저장 (파일공유)';
+      el.style.color = CLOUD_ON ? (ok ? '#2e7d32' : '#9a7500') : 'var(--muted)';
+    }
+
     // --- 이름 ---
     let myName = localStorage.getItem(LS_NAME) || '';
     const whoName = document.getElementById('whoName');
@@ -667,7 +741,8 @@
       f.el.addEventListener('blur', ()=>{
         if (!editing) return;
         saveEdit(f.id, f.el.textContent);
-        toast('저장됨 💾');
+        cloudPush();
+        toast(CLOUD_ON ? '저장 & 동기화됨 ☁️' : '저장됨 💾');
       });
     });
 
@@ -675,7 +750,7 @@
     const memoInput = document.getElementById('memoInput');
     const memoList = document.getElementById('memoList');
     function getMemos(){ try { return JSON.parse(localStorage.getItem(LS_MEMOS) || '[]'); } catch(e){ return []; } }
-    function setMemos(m){ localStorage.setItem(LS_MEMOS, JSON.stringify(m)); }
+    function setMemos(m){ localStorage.setItem(LS_MEMOS, JSON.stringify(m)); cloudPush(); }
     function renderMemos(){
       const memos = getMemos();
       memoList.innerHTML = '';
@@ -699,6 +774,11 @@
     document.getElementById('memoAdd').addEventListener('click', addMemo);
     memoInput.addEventListener('keydown', e=>{ if(e.key==='Enter') addMemo(); });
     renderMemos();
+
+    // 체크박스 변경도 클라우드로 동기화
+    document.querySelectorAll('.check input[type="checkbox"]').forEach(b=>{
+      b.addEventListener('change', ()=>{ if(!applyingRemote) cloudPush(); });
+    });
 
     // --- 체크박스 상태 포함해서 내보내기 ---
     function collectChecks(){
@@ -771,6 +851,10 @@
       toastEl.textContent = msg; toastEl.classList.add('show');
       clearTimeout(toastEl._t); toastEl._t = setTimeout(()=> toastEl.classList.remove('show'), 1800);
     }
+
+    // --- 클라우드 시작 ---
+    cloudDot(false);
+    if (CLOUD_ON) cloudInit();
   })();
 
   // ===== 여행 도우미 챗봇 (오프라인, 키워드 기반) =====
