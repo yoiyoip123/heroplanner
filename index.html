@@ -880,8 +880,8 @@
     // --- 편집 가능한 필드에 안정적인 ID 부여 ---
     // 일정 제목/설명, 섹션 제목, 정보카드, 체크리스트 항목, 주의사항 팁, 이동표시 등 거의 모든 텍스트
     const editSelectors = [
-      '.t-title', '.t-desc', '.day-date', '.day-tag', '.section-note',
-      '.section-title', '.move-tag',           // 섹션 제목 · 이동 구간
+      '.t-time', '.t-title', '.t-desc', '.day-date', '.day-tag', '.section-note',
+      '.section-title', '.move-tag',           // 시간 · 섹션 제목 · 이동 구간
       '.info h4', '.info p', '.info li',        // 한눈에 보기 카드
       '.hotel .h-name', '.hotel .h-addr',       // 숙소 정보
       '.check h4', '.check label span',         // 체크리스트 제목 · 각 항목
@@ -893,6 +893,8 @@
       document.querySelectorAll(sel).forEach((el, i) => {
         // 체크박스 자체나 지도 링크는 편집 대상에서 제외
         if (el.querySelector && el.querySelector('input, .maplink')) return;
+        // 이동구간(.move)의 빈 시간칸은 제외
+        if (el.classList.contains('t-time') && el.closest('li.move')) return;
         const id = sel.replace(/[^a-z]/gi,'') + '-' + i;
         el.setAttribute('data-edit', id);
         fields.push({ id, el });
