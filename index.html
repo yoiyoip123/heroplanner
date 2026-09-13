@@ -208,6 +208,16 @@
   body.editing .timeline li.hidden-item .t-title { text-decoration: line-through; }
   .item-del.restore { color: var(--porto); }
 
+  /* ➕ 일정 추가 버튼 (편집 모드에서만 보임) */
+  .add-item-btn {
+    display: none; width: calc(100% - 36px); margin: 0 18px 14px;
+    padding: 9px; border: 1.5px dashed var(--porto); border-radius: 10px;
+    background: var(--porto-soft); color: var(--porto); font-weight: 700;
+    font-size: 0.85rem; cursor: pointer;
+  }
+  .add-item-btn:hover { background: #e2eff8; }
+  body.editing .add-item-btn { display: block; }
+
   /* 일정 외 블록(체크리스트 항목·주의사항·카드 등) 삭제 */
   .deletable { position: relative; }
   .block-del {
@@ -313,6 +323,35 @@
   body.editing .timeline li.has-map { cursor: text; }
   body.editing .timeline li.has-map:hover { background: transparent; }
   body.editing .timeline li.has-map .t-title::after { content: ""; }
+
+  /* 예약서/티켓 보관함 */
+  .docs-drop {
+    border: 2px dashed var(--line); border-radius: 14px; padding: 20px 16px;
+    text-align: center; color: var(--muted); font-size: 0.9rem; cursor: pointer;
+    background: var(--card); transition: all 0.15s;
+  }
+  .docs-drop:hover, .docs-drop.dragover { border-color: var(--porto); background: var(--porto-soft); color: var(--porto); }
+  .docs-drop b { color: var(--porto); }
+  .docs-list { list-style: none; padding: 0; margin: 12px 0 0; }
+  .docs-list li {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 14px; margin: 8px 0;
+  }
+  .docs-list .d-icon { font-size: 1.5rem; flex: 0 0 auto; }
+  .docs-list .d-info { flex: 1; min-width: 0; }
+  .docs-list .d-name { font-weight: 600; font-size: 0.9rem; word-break: break-all; }
+  .docs-list .d-name a { color: var(--ink); text-decoration: none; }
+  .docs-list .d-name a:hover { color: var(--porto); text-decoration: underline; }
+  .docs-list .d-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .docs-list .d-open {
+    flex: 0 0 auto; font-size: 0.78rem; font-weight: 600; color: #fff; background: var(--porto);
+    border: none; border-radius: 999px; padding: 6px 13px; cursor: pointer; text-decoration: none;
+  }
+  .docs-list .d-del {
+    flex: 0 0 auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem;
+  }
+  .docs-note { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
 
   .maplink {
     display: inline-block; font-size: 0.78rem; color: var(--porto);
@@ -455,6 +494,7 @@
   <a href="#porto">포르투</a>
   <a href="#bcn2">바르셀로나 ②</a>
   <a href="#checklist">체크리스트</a>
+  <a href="#docs">📎 예약서</a>
   <a href="#tips">주의사항</a>
   <a href="#memo">메모</a>
 </nav>
@@ -567,6 +607,7 @@
       <li><span class="t-time">19:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 공항 도착 (오후 7시)</div><div class="t-desc">입국 심사 + 짐 찾기. 밤 도착이라 오늘은 이동·체크인만.</div></div></li>
       <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚆 공항→호텔 · 약 40~50분 (R2 Nord 기차 또는 Aerobus+택시)</span></div></li>
       <li><span class="t-time">20:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏨</span>Arcelon Hotel 체크인</div><div class="t-desc">짐 풀고 휴식.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 호텔→근처 식당 · 도보 약 5분</span></div></li>
       <li><span class="t-time">21:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌮</span>근처에서 늦은 저녁</div><div class="t-desc">호텔 근처 타파스 바에서 가볍게. 시차 적응 겸 일찍 취침. (스페인은 저녁 늦게까지 영업)</div></div></li>
     </ul>
   </div>
@@ -584,6 +625,7 @@
       <li><span class="t-time">18:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>바르셀로나 대성당 &amp; 라 보케리아</div><div class="t-desc">고딕 지구 대성당(옥상 전망) + 람블라스 옆 보케리아 시장 간식. ⏱️ ~19:00 · 💶 대성당 €9~11 / 시장 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Cathedral+of+Barcelona" target="_blank">📍 지도</a></div></li>
       <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 고딕→보른(피카소미술관) · 도보 약 10분</span></div></li>
       <li><span class="t-time">19:30</span><div class="t-body"><div class="t-title"><span class="t-emoji">🎨</span>피카소 미술관 (El Born)</div><div class="t-desc">목요일 저녁 무료입장 시간대 있음(요일 확인). ⏱️ ~20:30 · 💶 €12~14</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Picasso+Museum+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 미술관→보른 타파스 골목 · 도보 약 5분</span></div></li>
       <li><span class="t-time">21:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍷</span>재회 기념 저녁 + 상그리아</div><div class="t-desc">보른(El Born) 타파스 골목. 미술관에서 도보 5분 내. 웅희랑 첫날 밤 건배 🥂</div></div></li>
     </ul>
   </div>
@@ -597,6 +639,7 @@
       <li><span class="t-time">10:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛰️</span>몬세라트 수도원 (Santa Maria de Montserrat)</div><div class="t-desc">바실리카 + 검은 성모상(라 모레네타) + 박물관. 톱니 모양 산 전망. 소년합창단(Escolania) 13시 공연(여름방학 제외). 여유 되면 푸니쿨라 타고 산 위 전망대·하이킹도! ⏱️ 4~5시간 · 💶 콤비 €18~25 (비EU 유료, 사전예약 권장)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Montserrat+Monastery" target="_blank">📍 지도</a></div></li>
       <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚆 몬세라트→바르셀로나 · 약 1.5시간 (케이블카/랙철도 + R5 기차)</span></div></li>
       <li><span class="t-time">18:30</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏨</span>바르셀로나 복귀 &amp; 휴식</div><div class="t-desc">산에서 하루 보냈으니 잠깐 쉬기.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 호텔→시내 식당 · 도보 약 10분</span></div></li>
       <li><span class="t-time">20:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>시내에서 저녁</div><div class="t-desc">여유로운 저녁 식사. 그라시아·고딕 지구 레스토랑 추천. 다음날(시체스) 대비 일찍 휴식.</div></div></li>
     </ul>
   </div>
@@ -608,7 +651,9 @@
       <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏖️</span>시체스 해변 &amp; 구시가지</div><div class="t-desc">해변 휴식, 산 바르토메우 성당 앞 포토존, 해산물 점심. ⏱️ 반나절 · 💶 해변 무료</div></div></li>
       <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚆 시체스→바르셀로나(Sants) · 약 40분 · Sants에서 몬주익 가까움</span></div></li>
       <li><span class="t-time">17:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏰</span>몬주익 성 &amp; MNAC (외관·전망)</div><div class="t-desc">복귀 후 몬주익 언덕(케이블카 추천). 성에서 항구·시내 노을 전망 + MNAC 웅장한 건물·계단 뷰. ⚠️ MNAC 내부는 저녁 마감(보통 ~20시)이라 관람 원하면 서두르기. ⏱️ 약 1.5시간 · 💶 몬주익 성 €12 / MNAC €12</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Montjuic+Castle+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 몬주익 성/MNAC→마법의 분수 · 도보 약 10분(내리막)</span></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛲</span>몬주익 마법의 분수 쇼</div><div class="t-desc">MNAC 바로 앞. 주말 저녁 분수+조명+음악 쇼(시즌 시간 확인). 저녁 쇼라 딱 맞음! ⏱️ 약 30분 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Magic+Fountain+of+Montjuic" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 에스파냐 광장→시내 · 지하철 약 15분</span></div></li>
       <li><span class="t-time">밤</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>저녁 식사 &amp; 짐 정리</div><div class="t-desc">에스파냐 광장/시내에서 바르셀로나 마지막 저녁. 숙소 복귀 후 다음날 포르투行 짐 정리.</div></div></li>
     </ul>
   </div>
@@ -616,10 +661,14 @@
   <div class="day flight">
     <div class="day-head"><span class="day-date">9/28 일</span><span class="day-tag">✈️ 포르투로</span></div>
     <ul class="timeline">
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚕 호텔→바르셀로나 공항 · 약 30~40분 (택시/공항철도)</span></div></li>
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🧳</span>체크아웃 &amp; 공항 이동</div><div class="t-desc">Arcelon Hotel 체크아웃. 국제선 기준 최소 2시간 전 공항 도착 권장 → 14:00쯤 공항.</div></div></li>
       <li><span class="t-time">16:45</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 → 포르투 출발</div><div class="t-desc">약 2시간 비행 (시차 -1시간, 포르투가 1시간 느림).</div></div></li>
-      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚇</span>포르투 도착 &amp; 체크인</div><div class="t-desc">공항 메트로 E선(보라색) → Trindade, 약 30분 €2.25. chic&amp;basic Gravity 체크인. ⏱️ 도착~체크인 약 1시간</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 포르투 공항→시내(Trindade) · 메트로 E선 약 30분 · €2.25</span></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚇</span>포르투 도착 &amp; 체크인</div><div class="t-desc">chic&amp;basic Gravity 체크인. ⏱️ 도착~체크인 약 1시간</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 숙소→Fábrica do Azeite · 도보 약 5분</span></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🫒</span>올리브 테이스팅 (Fábrica do Azeite)</div><div class="t-desc">시내 다운타운, 숙소 근처. '세계 최고 올리브오일숍' 수상. 저녁 늦게까지 여는 편이라 도착 첫날 가볍게 시음 + 하몽/치즈 보드 저녁. ⏱️ 약 1시간 · 💶 시음 옵션별 상이(오일 구매 추천)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Fabrica+do+Azeite+Porto" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 시내→동 루이스 다리 · 도보 약 10분</span></div></li>
       <li><span class="t-time">밤</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌉</span>동 루이스 1세 다리 야경</div><div class="t-desc">첫날 밤 마무리. 다리 위층에서 도루강 &amp; 히베이라 불빛 야경. ⏱️ 약 30~40분 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Dom+Luis+I+Bridge+Porto" target="_blank">📍 지도</a></div></li>
     </ul>
   </div>
@@ -632,6 +681,7 @@
     <div class="day-head"><span class="day-date">9/29 월</span><span class="day-tag">🍷 도루 밸리</span></div>
     <ul class="timeline">
       <li><span class="t-time">종일</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍇</span>Douro Valley Wine 투어 <span style="color:var(--bcn);font-weight:700;">(예약 필요!)</span></div><div class="t-desc">테라스 포도밭 + 와이너리(퀸타) 시음 + 두오루 강변 드라이브. 보통 08:30~09:00 픽업, 저녁 복귀. ⚠️ 아직 예약 안 함 — 인기 많으니 미리 예약! ⏱️ 종일(9~10시간) · 💶 투어 상품별 €80~130대(점심·시음 포함 많음)</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚐 투어 종료 후 시내 복귀 → 가이아 강변 · 도보 약 10분</span></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>가이아 강변 저녁</div><div class="t-desc">Vila Nova de Gaia에서 동 루이스 다리 야경 보며 저녁.</div></div></li>
     </ul>
   </div>
@@ -640,11 +690,18 @@
     <div class="day-head"><span class="day-date">9/30 화</span><span class="day-tag">📚 포르투 시내</span></div>
     <ul class="timeline">
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">📚</span>Livraria Lello (렐루 서점) <span style="color:var(--bcn);font-weight:700;">(예약 필요!)</span></div><div class="t-desc">⚠️ 아직 예약 안 함 — 입장권 사전구매 필수(당일 줄 매우 김). 개장 직후가 한산. 해리포터 영감 서점. ⏱️ 약 30~45분 · 💶 €8 (책 구매 시 차감)</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 렐루→클레리구스 탑 · 도보 약 2분(바로 옆)</span></div></li>
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>클레리구스 탑 &amp; 카르무 성당</div><div class="t-desc">렐루 바로 옆. 탑 전망 + 아줄레주 외벽. ⏱️ 약 40분 · 💶 탑 €8~ / 카르무 무료(외관)</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 클레리구스→상 벤투 역 · 도보 약 8분(내리막)</span></div></li>
       <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚉</span>상 벤투 역 &amp; 볼량 시장</div><div class="t-desc">상 벤투 역 아줄레주 벽화(꼭 보기!) + 볼량 시장 현지 간식·점심. ⏱️ 약 1시간 · 💶 무료(시장 먹거리 별도)</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 상 벤투→히베이라 강변 · 도보 약 7분(내리막)</span></div></li>
       <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌉</span>히베이라 → 동 루이스 다리 건너 가이아</div><div class="t-desc">강변 알록달록 구시가(유네스코) 산책 후 다리 도보 횡단. ⏱️ 산책 약 45분 · 💶 무료</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 다리 건너 가이아→WOW · 도보 약 10분(언덕)</span></div></li>
       <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍇</span>WOW (World of Wine) 복합문화공간</div><div class="t-desc">가이아 언덕. 와인·초콜릿·코르크 테마 박물관 + 포트와인 시음 + 파노라마 테라스. ⏱️ 반나절(3~5h) · 💶 지구 입장 €5, Day Pass 약 €25~40(박물관 수 선택). 시간 여유 있게!</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=WOW+World+of+Wine+Porto" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 WOW→세하 두 필라르 · 도보 약 5분</span></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌇</span>세하 두 필라르 수도원 야경</div><div class="t-desc">WOW 바로 근처(도보). 포르투 시가지 + 동 루이스 다리 최고의 노을·야경 스팟. ⏱️ 약 30분 · 💶 전망대 무료 / 내부 €5</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Mosteiro+da+Serra+do+Pilar+Porto" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 세하 두 필라르→가이아 강변 · 도보 약 8분</span></div></li>
+      <li><span class="t-time">밤</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>가이아 강변 저녁</div><div class="t-desc">WOW 내 레스토랑 또는 가이아 강변에서 야경 보며 저녁. 프란세지냐(현지 샌드위치) 추천!</div></div></li>
       <li><span class="t-time">밤</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>가이아 강변 저녁</div><div class="t-desc">WOW 내 레스토랑 또는 가이아 강변에서 야경 보며 저녁. 프란세지냐(현지 샌드위치) 추천!</div></div></li>
     </ul>
   </div>
@@ -652,10 +709,14 @@
   <div class="day flight porto-day">
     <div class="day-head"><span class="day-date">10/1 수</span><span class="day-tag">✈️ 바르셀로나 복귀 + 사그라다</span></div>
     <ul class="timeline">
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 숙소→포르투 공항 · 메트로 E선 약 30분</span></div></li>
       <li><span class="t-time">아침</span><div class="t-body"><div class="t-title"><span class="t-emoji">🧳</span>체크아웃 &amp; 공항 이동</div><div class="t-desc">이른 아침 체크아웃. 메트로 E선으로 공항. 늦어도 10:00 도착.</div></div></li>
       <li><span class="t-time">12:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>포르투 → 바르셀로나 출발</div><div class="t-desc">약 2시간 비행 + 시차 +1시간 → 바르셀로나 대략 15:00 도착.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚕 바르셀로나 공항→호텔 · 약 30~40분</span></div></li>
       <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏨</span>Arcelon Hotel 재체크인</div><div class="t-desc">공항 → 호텔 짐 두고 사그라다 파밀리아로 이동. ⚠️ 지연 대비 여유 필수.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 호텔→사그라다 파밀리아 · 지하철 약 15분</span></div></li>
       <li><span class="t-time">18:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">⛪</span>사그라다 파밀리아 (예약함!)</div><div class="t-desc">시간지정 입장 — 시간 엄수! 여권/QR 준비. 노을빛 스테인드글라스가 특히 아름다운 시간대. ⏱️ 약 1~1.5시간 · 💶 €26~34 (타워 포함 €47)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Sagrada+Familia+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 사그라다→그라시아 지구 식당 · 도보 약 15분 or 지하철 10분</span></div></li>
       <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>마지막 밤 저녁</div><div class="t-desc">그라시아 지구에서 여행 마무리 디너.</div></div></li>
     </ul>
   </div>
@@ -668,6 +729,7 @@
     <div class="day-head"><span class="day-date">10/2 목</span><span class="day-tag">✈️ 시애틀行</span></div>
     <ul class="timeline">
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🛍️</span>마지막 오전 &amp; 체크아웃</div><div class="t-desc">기념품 쇼핑 / 카페. 국제선 → 최소 3시간 전 공항 도착 권장(늦어도 10:00).</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚕 호텔→바르셀로나 공항 · 약 30~40분 (택시/공항철도)</span></div></li>
       <li><span class="t-time">13:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 → 시애틀 출발</div><div class="t-desc">즐거운 귀국길! ✨</div></div></li>
     </ul>
   </div>
@@ -755,6 +817,17 @@
     <b>렐루 서점 &amp; 도루밸리</b> — 렐루는 <b>입장권 사전구매</b> 필수(당일 줄 매우 김), 개장 직후가 한산해요. 도루밸리 투어는 종일 걸리니 편한 신발 + 멀미약 챙기기.
   </div>
 
+  <!-- 예약서 / 티켓 보관함 -->
+  <h2 class="section-title" id="docs">📎 예약서 &amp; 티켓 보관함</h2>
+  <p class="section-note">항공권·호텔 예약서·투어 바우처·티켓을 올려두고, 눌러서 바로 열어봐요. (PDF·이미지)</p>
+  <div class="docs-drop" id="docsDrop">
+    📄 여기를 <b>탭하거나</b> 파일을 <b>끌어다 놓기</b><br>
+    <span style="font-size:.8rem;">항공권 · 호텔 예약서 · 투어 바우처 · QR 티켓 등</span>
+  </div>
+  <input type="file" id="docsInput" accept="image/*,application/pdf" multiple style="display:none" />
+  <ul class="docs-list" id="docsList"></ul>
+  <p class="docs-note">🔒 올린 파일은 <b>이 기기(브라우저)에만</b> 저장돼요. 웅희랑 나눠 보려면 카톡으로 파일을 직접 보내거나 각자 올리면 돼요. (민감한 개인정보라 안전하게 기기 저장 방식이에요)</p>
+
   <!-- MEMO / 함께 쓰는 메모 -->
   <h2 class="section-title" id="memo">📝 함께 쓰는 메모</h2>
   <p class="section-note">가고 싶은 곳, 사고 싶은 것, 할 말 자유롭게 남겨요. (내보내기로 서로 공유)</p>
@@ -792,6 +865,116 @@
 </div>
 
 <script>
+  // ===== 📎 예약서/티켓 보관함 (IndexedDB에 파일 저장) =====
+  (function(){
+    const drop = document.getElementById('docsDrop');
+    const input = document.getElementById('docsInput');
+    const listEl = document.getElementById('docsList');
+    if (!drop || !input || !listEl) return;
+
+    // --- IndexedDB 열기 ---
+    let db = null;
+    const req = indexedDB.open('trip-docs', 1);
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('files')) d.createObjectStore('files', { keyPath: 'id' });
+    };
+    req.onsuccess = (e) => { db = e.target.result; renderList(); };
+    req.onerror = () => { listEl.innerHTML = '<li>저장소를 열 수 없어요 😢</li>'; };
+
+    function tx(mode){ return db.transaction('files', mode).objectStore('files'); }
+
+    function addFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        const rec = {
+          id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          added: new Date().toISOString(),
+          data: reader.result   // ArrayBuffer
+        };
+        const store = tx('readwrite');
+        store.add(rec);
+        store.transaction.oncomplete = renderList;
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function delFile(id){
+      const store = tx('readwrite');
+      store.delete(id);
+      store.transaction.oncomplete = renderList;
+    }
+
+    function openFile(rec){
+      const blob = new Blob([rec.data], { type: rec.type || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // 메모리 정리(잠시 후)
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+
+    function iconFor(type){
+      if (!type) return '📄';
+      if (type.startsWith('image/')) return '🖼️';
+      if (type === 'application/pdf') return '📕';
+      return '📄';
+    }
+    function fmtSize(b){
+      if (b < 1024) return b + ' B';
+      if (b < 1024*1024) return (b/1024).toFixed(0) + ' KB';
+      return (b/1024/1024).toFixed(1) + ' MB';
+    }
+
+    function renderList(){
+      if (!db) return;
+      const store = tx('readonly');
+      const all = store.getAll();
+      all.onsuccess = () => {
+        const recs = all.result.sort((a,b)=> (a.added<b.added?1:-1));
+        listEl.innerHTML = '';
+        if (!recs.length){
+          listEl.innerHTML = '<li style="justify-content:center;color:var(--muted);font-size:.85rem;">아직 올린 파일이 없어요</li>';
+          return;
+        }
+        recs.forEach(rec => {
+          const li = document.createElement('li');
+          const icon = document.createElement('span'); icon.className='d-icon'; icon.textContent = iconFor(rec.type);
+          const info = document.createElement('div'); info.className='d-info';
+          const nm = document.createElement('div'); nm.className='d-name';
+          const a = document.createElement('a'); a.href='#'; a.textContent = rec.name;
+          a.addEventListener('click', (e)=>{ e.preventDefault(); openFile(rec); });
+          nm.appendChild(a);
+          const meta = document.createElement('div'); meta.className='d-meta';
+          meta.textContent = fmtSize(rec.size) + ' · ' + new Date(rec.added).toLocaleDateString('ko-KR');
+          info.appendChild(nm); info.appendChild(meta);
+          const openBtn = document.createElement('button'); openBtn.className='d-open'; openBtn.textContent='열기';
+          openBtn.addEventListener('click', ()=> openFile(rec));
+          const del = document.createElement('button'); del.className='d-del'; del.textContent='🗑'; del.title='삭제';
+          del.addEventListener('click', ()=>{ if(confirm('이 파일을 삭제할까요?')) delFile(rec.id); });
+          li.appendChild(icon); li.appendChild(info); li.appendChild(openBtn); li.appendChild(del);
+          listEl.appendChild(li);
+        });
+      };
+    }
+
+    // --- 업로드 트리거 ---
+    drop.addEventListener('click', ()=> input.click());
+    input.addEventListener('change', ()=>{
+      Array.from(input.files).forEach(addFile);
+      input.value = '';
+    });
+    // 드래그앤드롭
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('dragover'); }));
+    drop.addEventListener('drop', e=>{
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (files) Array.from(files).forEach(addFile);
+    });
+  })();
+
   // ===== 각 일정 블록(항목 전체)을 누르면 구글맵으로 이동 =====
   (function(){
     document.querySelectorAll('.timeline li').forEach(li => {
@@ -985,6 +1168,75 @@
       saveOrder();
     }
     document.addEventListener('pointerdown', onDown);
+
+    // ===== ➕ 일정 추가 =====
+    const LS_ADDED = 'trip-added-v1';   // [{ tl, item }]  추가된 빈 항목 목록
+    function getAdded(){ try { return JSON.parse(localStorage.getItem(LS_ADDED)||'[]'); } catch(e){ return []; } }
+    function setAdded(list){ localStorage.setItem(LS_ADDED, JSON.stringify(list)); }
+
+    // 새 li 요소 만들기 (핸들 + 편집필드 + 삭제버튼)
+    function buildItem(itemId){
+      const li = document.createElement('li');
+      li.dataset.item = itemId;
+      li.innerHTML =
+        '<span class="drag-handle" title="드래그해서 순서 바꾸기">⠿</span>' +
+        '<span class="t-time">시간</span>' +
+        '<div class="t-body">' +
+          '<div class="t-title"><span class="t-emoji">📍</span>새 일정</div>' +
+          '<div class="t-desc">설명을 입력하세요</div>' +
+        '</div>';
+      const d = document.createElement('button');
+      d.className = 'item-del'; d.textContent = '🗑'; d.title = '이 일정 삭제';
+      d.addEventListener('click', (e)=>{ e.stopPropagation(); toggleHide(itemId); });
+      li.appendChild(d);
+      return li;
+    }
+
+    // 타임라인에 항목 붙이고 편집 가능하게 등록
+    function attachItem(tl, li){
+      // "➕ 추가" 버튼이 있으면 그 앞에 삽입
+      const addBtn = tl.parentElement.querySelector('.add-item-btn');
+      tl.appendChild(li);
+      // 편집 필드 등록 (편집 엔진이 준비돼 있으면)
+      if (window.__registerEditable) {
+        li.querySelectorAll('.t-time, .t-title, .t-desc').forEach(el => window.__registerEditable(el, li.dataset.item));
+      }
+    }
+
+    // 추가 버튼을 각 날짜에 삽입
+    timelines.forEach(tl => {
+      const day = tl.closest('.day');
+      if (!day || day.querySelector('.add-item-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'add-item-btn';
+      btn.textContent = '➕ 일정 추가';
+      btn.addEventListener('click', ()=>{
+        const itemId = tl.dataset.tl + '-add-' + Date.now().toString(36);
+        const li = buildItem(itemId);
+        attachItem(tl, li);
+        // 저장
+        const added = getAdded(); added.push({ tl: tl.dataset.tl, item: itemId }); setAdded(added);
+        saveOrder();
+        if (window.__tripCloudPush) window.__tripCloudPush();
+        // 새 항목 제목에 포커스
+        const t = li.querySelector('.t-title'); if (t){ t.focus && t.focus(); }
+      });
+      day.appendChild(btn);
+    });
+
+    // 저장된 추가 항목 재생성 (로드 시 / 클라우드 수신 시)
+    window.__rebuildAdded = function(list){
+      if (Array.isArray(list)) setAdded(list);
+      const items = getAdded();
+      items.forEach(rec => {
+        const tl = document.querySelector('.timeline[data-tl="'+rec.tl+'"]');
+        if (!tl) return;
+        if (tl.querySelector('[data-item="'+rec.item+'"]')) return; // 이미 있음
+        const li = buildItem(rec.item);
+        attachItem(tl, li);
+      });
+    };
+    window.__collectAdded = function(){ return getAdded(); };
   })();
 
   // 체크박스 상태를 브라우저에 저장 (웅희도 각자 기기에서 체크 가능)
@@ -1027,7 +1279,8 @@
       let memos = []; try { memos = JSON.parse(localStorage.getItem(LS_MEMOS)||'[]'); } catch(e){}
       const hidden = window.__collectHidden ? window.__collectHidden() : [];
       const order = window.__collectOrder ? window.__collectOrder() : {};
-      return { edits, memos, checks, hidden, order };
+      const added = window.__collectAdded ? window.__collectAdded() : [];
+      return { edits, memos, checks, hidden, order, added };
     }
 
     // 클라우드에 저장 (디바운스)
@@ -1051,6 +1304,8 @@
       if (!data) return;
       applyingRemote = true;
       try {
+        // 추가된 일정을 먼저 재생성해야 그 위에 편집/순서가 얹혀짐
+        if (Array.isArray(data.added) && window.__rebuildAdded){ window.__rebuildAdded(data.added); }
         if (data.edits){ localStorage.setItem(LS_EDITS, JSON.stringify(data.edits)); loadEdits(); }
         if (Array.isArray(data.memos)){ localStorage.setItem(LS_MEMOS, JSON.stringify(data.memos)); renderMemos(); }
         if (data.checks){
@@ -1167,15 +1422,37 @@
     }
     editToggle.addEventListener('click', ()=> setEditing(!editing));
 
-    // 편집 내용 저장 (포커스 아웃 시)
-    fields.forEach(f => {
+    // 편집 필드에 blur 저장 리스너 달기
+    function wireField(f){
       f.el.addEventListener('blur', ()=>{
         if (!editing) return;
         saveEdit(f.id, f.el.textContent);
         cloudPush();
         toast(CLOUD_ON ? '저장 & 동기화됨 ☁️' : '저장됨 💾');
       });
-    });
+    }
+    fields.forEach(wireField);
+
+    // 새로 추가된 일정 항목의 요소를 편집 가능하게 등록 (일정 추가 기능에서 호출)
+    window.__registerEditable = function(el, itemId){
+      let key = '';
+      if (el.classList.contains('t-time')) key = 'ttime';
+      else if (el.classList.contains('t-title')) key = 'ttitle';
+      else if (el.classList.contains('t-desc')) key = 'tdesc';
+      else key = 'x';
+      const id = itemId + '__' + key;
+      el.setAttribute('data-edit', id);
+      // 저장된 편집 내용이 있으면 적용
+      let edits = {}; try { edits = JSON.parse(localStorage.getItem(LS_EDITS)||'{}'); } catch(e){}
+      if (edits[id] !== undefined) el.textContent = edits[id];
+      const f = { id, el };
+      fields.push(f);
+      wireField(f);
+      if (editing) el.setAttribute('contenteditable', 'true');
+    };
+
+    // 로드 시: 저장된 "추가 일정"을 다시 만들어 편집 등록
+    if (window.__rebuildAdded) window.__rebuildAdded();
 
     // --- 메모 ---
     const memoInput = document.getElementById('memoInput');
@@ -1272,14 +1549,14 @@
       if (!confirm('모든 수정/메모/체크/순서/삭제를 원본으로 되돌릴까요?\n(웅희 화면도 함께 원본으로 돌아가요)')) return;
       // 로컬 삭제
       localStorage.removeItem(LS_EDITS); localStorage.removeItem(LS_MEMOS);
-      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-order-v2'); localStorage.removeItem('trip-hidden-v1');
+      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-order-v2'); localStorage.removeItem('trip-hidden-v1'); localStorage.removeItem('trip-added-v1');
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=> localStorage.removeItem('trip-check-'+i));
       // 클라우드도 빈 상태로 밀어서 다시 덮어써지지 않게
       if (sb) {
         try {
           await sb.from('trips').upsert({
             room: CFG.ROOM,
-            data: { edits:{}, memos:[], checks:{}, hidden:[], order:{} },
+            data: { edits:{}, memos:[], checks:{}, hidden:[], order:{}, added:[] },
             updated_at: new Date().toISOString()
           }, { onConflict: 'room' });
         } catch(e){ console.warn('클라우드 초기화 오류', e); }
