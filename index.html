@@ -171,18 +171,26 @@
   .t-desc { font-size: 0.86rem; color: var(--muted); margin-top: 1px; }
   .t-emoji { margin-right: 5px; }
 
+  /* 명소 안으로 합쳐진 이동시간 */
+  .move-inline { margin-top: 6px; }
+  .move-inline .move-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.76rem; color: var(--muted);
+    background: var(--bg); border: 1px dashed var(--line);
+    padding: 2px 10px; border-radius: 999px;
+  }
+
   /* 드래그 핸들 (편집 모드에서만 보임) */
   .drag-handle {
     display: none; flex: 0 0 auto; align-self: center;
     cursor: grab; color: var(--muted); font-size: 1.1rem;
     padding: 0 2px; touch-action: none; user-select: none;
   }
-  body.editing .timeline li:not(.move) .drag-handle { display: inline-flex; }
+  body.editing .timeline li .drag-handle { display: inline-flex; }
   body.editing .timeline li.dragging {
     background: #fffdf5; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     border-radius: 10px; opacity: 0.95;
   }
-  .timeline li.drop-target { border-top: 2px solid var(--porto) !important; }
 
   /* 항목 삭제 버튼 (편집 모드에서만 보임) */
   .item-del {
@@ -191,7 +199,7 @@
     color: var(--bcn); font-size: 1rem; padding: 2px 4px; border-radius: 6px;
   }
   .item-del:hover { background: var(--bcn-soft); }
-  body.editing .timeline li:not(.move) .item-del { display: inline-flex; }
+  body.editing .timeline li .item-del { display: inline-flex; }
   .timeline li.hidden-item { display: none; }
   /* 편집 모드에선 삭제(숨김)된 항목도 흐리게 보여서 복구 가능 */
   body.editing .timeline li.hidden-item {
@@ -199,6 +207,23 @@
   }
   body.editing .timeline li.hidden-item .t-title { text-decoration: line-through; }
   .item-del.restore { color: var(--porto); }
+
+  /* 일정 외 블록(체크리스트 항목·주의사항·카드 등) 삭제 */
+  .deletable { position: relative; }
+  .block-del {
+    display: none; position: absolute; top: 4px; right: 4px; z-index: 5;
+    align-self: auto;
+  }
+  body.editing .deletable > .block-del { display: inline-flex; }
+  .check label.deletable { padding-right: 26px; }
+  .deletable.hidden-item { display: none; }
+  body.editing .deletable.hidden-item {
+    display: block; opacity: 0.45;
+    background: repeating-linear-gradient(45deg,#fafafa,#fafafa 6px,#f0f0f0 6px,#f0f0f0 12px);
+  }
+  body.editing .check label.deletable.hidden-item { display: flex; }
+  body.editing .deletable.hidden-item .t-title,
+  body.editing .check label.deletable.hidden-item span { text-decoration: line-through; }
   /* 이동 구간 표시 */
   .timeline li.move { padding: 4px 0; border-top: none; }
   .timeline li.move .t-time { color: transparent; }
@@ -803,88 +828,116 @@
     });
   })();
 
-  // ===== 일정 순서 드래그로 바꾸기 (편집 모드) =====
+  // ===== 일정: 이동시간 합치기 + 순서 드래그 + 삭제 (편집 모드) =====
   (function(){
-    const LS_ORDER = 'trip-order-v1';
-    const LS_HIDDEN = 'trip-hidden-v1';   // 삭제(숨김)된 항목 id 목록
+    const LS_HIDDEN = 'trip-hidden-v1';
+    const LS_ORDER  = 'trip-order-v2';   // v2: 이동시간 합친 새 구조
 
-    // 각 타임라인과 항목에 안정적인 ID 부여
+    // 1) 이동구간(li.move)을 "바로 앞 명소" 항목 안으로 흡수 → 별도 li 제거
+    //    이러면 명소+이동시간이 한 덩어리가 되어 드래그해도 안 꼬임
+    document.querySelectorAll('.day .timeline').forEach(tl => {
+      Array.from(tl.querySelectorAll('li.move')).forEach(moveLi => {
+        const tag = moveLi.querySelector('.move-tag');
+        const prev = moveLi.previousElementSibling;
+        if (tag && prev && !prev.classList.contains('move')) {
+          const body = prev.querySelector('.t-body');
+          if (body) {
+            const wrap = document.createElement('div');
+            wrap.className = 'move-inline';
+            wrap.appendChild(tag);              // move-tag를 앞 명소 안으로 이동
+            body.appendChild(wrap);
+          }
+        }
+        moveLi.remove();                        // 빈 move li 제거
+      });
+    });
+
+    // 2) 각 항목에 안정 ID 부여 + 드래그 핸들 + 삭제 버튼
     const timelines = [];
     document.querySelectorAll('.day .timeline').forEach((tl, ti) => {
       const tlId = 'tl-' + ti;
       tl.dataset.tl = tlId;
       Array.from(tl.children).forEach((li, li_i) => {
         if (!li.dataset.item) li.dataset.item = tlId + '-item-' + li_i;
-        // 이동 구간(.move)은 핸들/삭제 없음
-        if (li.classList.contains('move')) return;
-        // 드래그 핸들 삽입 (맨 앞)
         if (!li.querySelector('.drag-handle')) {
           const h = document.createElement('span');
-          h.className = 'drag-handle';
-          h.textContent = '⠿';
-          h.title = '드래그해서 순서 바꾸기';
+          h.className = 'drag-handle'; h.textContent = '⠿'; h.title = '드래그해서 순서 바꾸기';
           li.insertBefore(h, li.firstChild);
         }
-        // 삭제 버튼 삽입 (맨 뒤)
         if (!li.querySelector('.item-del')) {
           const d = document.createElement('button');
-          d.className = 'item-del';
-          d.textContent = '🗑';
-          d.title = '이 일정 삭제';
-          d.addEventListener('click', (e)=>{ e.stopPropagation(); toggleHide(li); });
+          d.className = 'item-del'; d.textContent = '🗑'; d.title = '이 일정 삭제';
+          d.addEventListener('click', (e)=>{ e.stopPropagation(); toggleHide(li.dataset.item); });
           li.appendChild(d);
         }
       });
       timelines.push(tl);
     });
 
-    // --- 삭제(숨김) 관리 ---
+    // 2-b) 일정 외 삭제 대상: 체크리스트 항목 · 주의사항(팁/경고) · 숙소카드 · 정보카드
+    //      → 편집 가능한 거의 모든 블록에 삭제 버튼을 붙임
+    (function addDeletableTo(){
+      // 체크리스트 각 항목(label)
+      document.querySelectorAll('.check label').forEach((el, i) => tagDeletable(el, 'chk-'+i, '이 항목 삭제'));
+      // 주의사항 / 팁
+      document.querySelectorAll('.tip, .warn').forEach((el, i) => tagDeletable(el, 'tip-'+i, '이 안내 삭제'));
+      // 숙소 카드
+      document.querySelectorAll('.hotel').forEach((el, i) => tagDeletable(el, 'hotel-'+i, '이 숙소 삭제'));
+      // 한눈에 보기 정보 카드
+      document.querySelectorAll('.info').forEach((el, i) => tagDeletable(el, 'info-'+i, '이 카드 삭제'));
+    })();
+
+    function tagDeletable(el, id, title){
+      if (!el || el.dataset.del) return;
+      el.dataset.del = id;
+      el.classList.add('deletable');
+      const d = document.createElement('button');
+      d.className = 'item-del block-del'; d.textContent = '🗑'; d.title = title || '삭제';
+      d.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); toggleHide(id); });
+      el.appendChild(d);
+    }
+
+    // --- 삭제(숨김) : 일정(li.data-item) + 기타(*.data-del) 공통 관리 ---
     function getHidden(){ try { return JSON.parse(localStorage.getItem(LS_HIDDEN)||'[]'); } catch(e){ return []; } }
     function setHidden(list){ localStorage.setItem(LS_HIDDEN, JSON.stringify(list)); }
-    function applyHidden(list){
-      document.querySelectorAll('.timeline li[data-item]').forEach(li => {
-        const hidden = list.includes(li.dataset.item);
-        li.classList.toggle('hidden-item', hidden);
-        const btn = li.querySelector('.item-del');
-        if (btn){ btn.textContent = hidden ? '↩' : '🗑'; btn.title = hidden ? '복구' : '이 일정 삭제'; btn.classList.toggle('restore', hidden); }
-      });
+    function elById(id){
+      return document.querySelector('.timeline li[data-item="'+id+'"]') || document.querySelector('[data-del="'+id+'"]');
     }
-    function toggleHide(li){
-      const id = li.dataset.item;
+    function applyHidden(list){
+      // 일정 항목
+      document.querySelectorAll('.timeline li[data-item]').forEach(li => paint(li, li.dataset.item, list, '이 일정 삭제'));
+      // 기타 삭제 대상
+      document.querySelectorAll('[data-del]').forEach(el => paint(el, el.dataset.del, list, el.querySelector('.item-del')?.title || '삭제'));
+    }
+    function paint(el, id, list, delTitle){
+      const hidden = list.includes(id);
+      el.classList.toggle('hidden-item', hidden);
+      const btn = el.querySelector(':scope > .item-del');
+      if (btn){ btn.textContent = hidden ? '↩' : '🗑'; btn.title = hidden ? '복구' : delTitle; btn.classList.toggle('restore', hidden); }
+    }
+    function toggleHide(id){
       let list = getHidden();
-      if (list.includes(id)) list = list.filter(x=>x!==id);
-      else list.push(id);
-      setHidden(list);
-      applyHidden(list);
+      if (list.includes(id)) list = list.filter(x=>x!==id); else list.push(id);
+      setHidden(list); applyHidden(list);
       if (window.__tripCloudPush) window.__tripCloudPush();
     }
-    // 외부(클라우드)에서 숨김목록 적용/수집
     window.__applyHidden = function(list){ if (Array.isArray(list)){ setHidden(list); applyHidden(list); } };
     window.__collectHidden = function(){ return getHidden(); };
-    // 로드 시 적용
-    applyHidden(getHidden());
 
     // --- 순서 저장/복원 ---
     function getOrder(){ try { return JSON.parse(localStorage.getItem(LS_ORDER)||'{}'); } catch(e){ return {}; } }
     function saveOrder(){
       const order = {};
-      timelines.forEach(tl => {
-        order[tl.dataset.tl] = Array.from(tl.children).map(li => li.dataset.item);
-      });
+      timelines.forEach(tl => { order[tl.dataset.tl] = Array.from(tl.children).map(li => li.dataset.item); });
       localStorage.setItem(LS_ORDER, JSON.stringify(order));
-      // 클라우드 동기화 (편집 엔진이 준비돼 있으면)
       if (window.__tripCloudPush) window.__tripCloudPush();
     }
-    // 외부(클라우드)에서 순서 적용
     window.__applyOrder = function(order){
       if (!order) return;
       timelines.forEach(tl => {
         const ids = order[tl.dataset.tl];
         if (!Array.isArray(ids)) return;
-        ids.forEach(id => {
-          const el = tl.querySelector('[data-item="'+id+'"]');
-          if (el) tl.appendChild(el); // 순서대로 뒤에 붙이면 재정렬됨
-        });
+        ids.forEach(id => { const el = tl.querySelector('[data-item="'+id+'"]'); if (el) tl.appendChild(el); });
       });
     };
     window.__collectOrder = function(){
@@ -892,45 +945,37 @@
       timelines.forEach(tl => { order[tl.dataset.tl] = Array.from(tl.children).map(li => li.dataset.item); });
       return order;
     };
-    // 로드 시 저장된 순서 적용
+
+    // 로드 시 저장된 순서·숨김 적용
     window.__applyOrder(getOrder());
+    applyHidden(getHidden());
 
-    // --- Pointer 기반 드래그 (PC + 모바일) ---
-    let dragging = null, startY = 0, curTL = null;
-
+    // --- Pointer 드래그 (PC + 모바일) ---
+    let dragging = null, curTL = null;
     function onDown(e){
       const handle = e.target.closest('.drag-handle');
-      if (!handle) return;
-      if (!document.body.classList.contains('editing')) return;
-      const li = handle.closest('li');
-      if (!li) return;
+      if (!handle || !document.body.classList.contains('editing')) return;
+      const li = handle.closest('li'); if (!li) return;
       e.preventDefault();
       dragging = li; curTL = li.parentElement;
       li.classList.add('dragging');
-      startY = e.clientY;
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
     }
-
     function onMove(e){
       if (!dragging) return;
       e.preventDefault();
-      // 커서 위치의 형제 항목 찾기
-      const siblings = Array.from(curTL.children).filter(c => c !== dragging && !c.classList.contains('move') ? true : c !== dragging);
       let placed = false;
       for (const sib of Array.from(curTL.children)) {
         if (sib === dragging) continue;
         const rect = sib.getBoundingClientRect();
-        const mid = rect.top + rect.height / 2;
-        if (e.clientY < mid) {
+        if (e.clientY < rect.top + rect.height/2) {
           if (sib.previousElementSibling !== dragging) curTL.insertBefore(dragging, sib);
-          placed = true;
-          break;
+          placed = true; break;
         }
       }
-      if (!placed) curTL.appendChild(dragging); // 맨 아래로
+      if (!placed) curTL.appendChild(dragging);
     }
-
     function onUp(){
       if (!dragging) return;
       dragging.classList.remove('dragging');
@@ -938,10 +983,7 @@
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerup', onUp);
       saveOrder();
-      const t = document.querySelector('.save-toast');
-      // 간단 안내
     }
-
     document.addEventListener('pointerdown', onDown);
   })();
 
@@ -983,9 +1025,9 @@
       const checks = {};
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=>{ checks['trip-check-'+i] = b.checked ? '1':'0'; });
       let memos = []; try { memos = JSON.parse(localStorage.getItem(LS_MEMOS)||'[]'); } catch(e){}
-      const order = window.__collectOrder ? window.__collectOrder() : {};
       const hidden = window.__collectHidden ? window.__collectHidden() : [];
-      return { edits, memos, checks, order, hidden };
+      const order = window.__collectOrder ? window.__collectOrder() : {};
+      return { edits, memos, checks, hidden, order };
     }
 
     // 클라우드에 저장 (디바운스)
@@ -1002,7 +1044,7 @@
       }, 400);
     }
     // 드래그 순서변경 등 외부에서 클라우드 저장을 호출할 수 있게 노출
-    window.__tripCloudPush = function(){ cloudPush(); toast(CLOUD_ON ? '순서 저장 & 동기화됨 ☁️' : '순서 저장됨 💾'); };
+    window.__tripCloudPush = function(){ cloudPush(); toast(CLOUD_ON ? '저장 & 동기화됨 ☁️' : '저장됨 💾'); };
 
     // 클라우드에서 받은 상태를 화면/로컬에 반영
     function applyCloud(data){
@@ -1017,12 +1059,12 @@
             if (v !== undefined){ b.checked = v==='1'; localStorage.setItem('trip-check-'+i, v); b.nextElementSibling.classList.toggle('done', b.checked); }
           });
         }
-        if (data.order && window.__applyOrder){
-          localStorage.setItem('trip-order-v1', JSON.stringify(data.order));
-          window.__applyOrder(data.order);
-        }
         if (data.hidden && window.__applyHidden){
           window.__applyHidden(data.hidden);
+        }
+        if (data.order && window.__applyOrder){
+          localStorage.setItem('trip-order-v2', JSON.stringify(data.order));
+          window.__applyOrder(data.order);
         }
       } finally { applyingRemote = false; }
     }
@@ -1077,7 +1119,16 @@
         if (el.querySelector && el.querySelector('input, .maplink')) return;
         // 이동구간(.move)의 빈 시간칸은 제외
         if (el.classList.contains('t-time') && el.closest('li.move')) return;
-        const id = sel.replace(/[^a-z]/gi,'') + '-' + i;
+        // 타임라인 항목 안의 요소는 부모 항목ID(data-item) 기준으로 안정적인 ID 부여
+        // → 드래그로 순서가 바뀌어도 제목·설명·시간이 항상 같은 항목에 붙어 움직임
+        let id;
+        const parentLi = el.closest('.timeline li[data-item]');
+        if (parentLi) {
+          const key = sel.replace(/[^a-z]/gi,'');
+          id = parentLi.dataset.item + '__' + key;
+        } else {
+          id = sel.replace(/[^a-z]/gi,'') + '-' + i;
+        }
         el.setAttribute('data-edit', id);
         fields.push({ id, el });
       });
@@ -1111,7 +1162,7 @@
       document.querySelectorAll('.check input[type="checkbox"]').forEach(b => { b.disabled = on; });
       editToggle.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';
       editToggle.classList.toggle('on', on);
-      if (on) toast('편집 모드! 글자 수정 + ⠿ 잡고 위아래로 순서 바꾸기');
+      if (on) toast('편집 모드! 글자 수정 · ⠿ 드래그로 순서 · 🗑 삭제');
       else toast('편집 끝! 이제 체크박스·지도도 다시 눌러져요');
     }
     editToggle.addEventListener('click', ()=> setEditing(!editing));
@@ -1216,12 +1267,23 @@
       reader.readAsText(file);
     });
 
-    // --- 내 수정 초기화 ---
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-      if (!confirm('내 수정/메모/체크/순서/삭제를 모두 초기화할까요? (원본으로 돌아감)')) return;
+    // --- 내 수정 초기화 (로컬 + 클라우드까지 완전 초기화) ---
+    document.getElementById('resetBtn').addEventListener('click', async ()=>{
+      if (!confirm('모든 수정/메모/체크/순서/삭제를 원본으로 되돌릴까요?\n(웅희 화면도 함께 원본으로 돌아가요)')) return;
+      // 로컬 삭제
       localStorage.removeItem(LS_EDITS); localStorage.removeItem(LS_MEMOS);
-      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-hidden-v1');
+      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-order-v2'); localStorage.removeItem('trip-hidden-v1');
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=> localStorage.removeItem('trip-check-'+i));
+      // 클라우드도 빈 상태로 밀어서 다시 덮어써지지 않게
+      if (sb) {
+        try {
+          await sb.from('trips').upsert({
+            room: CFG.ROOM,
+            data: { edits:{}, memos:[], checks:{}, hidden:[], order:{} },
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'room' });
+        } catch(e){ console.warn('클라우드 초기화 오류', e); }
+      }
       location.reload();
     });
 
