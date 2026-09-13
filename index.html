@@ -183,6 +183,22 @@
     border-radius: 10px; opacity: 0.95;
   }
   .timeline li.drop-target { border-top: 2px solid var(--porto) !important; }
+
+  /* 항목 삭제 버튼 (편집 모드에서만 보임) */
+  .item-del {
+    display: none; flex: 0 0 auto; align-self: center;
+    border: none; background: transparent; cursor: pointer;
+    color: var(--bcn); font-size: 1rem; padding: 2px 4px; border-radius: 6px;
+  }
+  .item-del:hover { background: var(--bcn-soft); }
+  body.editing .timeline li:not(.move) .item-del { display: inline-flex; }
+  .timeline li.hidden-item { display: none; }
+  /* 편집 모드에선 삭제(숨김)된 항목도 흐리게 보여서 복구 가능 */
+  body.editing .timeline li.hidden-item {
+    display: flex; opacity: 0.4; background: repeating-linear-gradient(45deg,#fafafa,#fafafa 6px,#f0f0f0 6px,#f0f0f0 12px);
+  }
+  body.editing .timeline li.hidden-item .t-title { text-decoration: line-through; }
+  .item-del.restore { color: var(--porto); }
   /* 이동 구간 표시 */
   .timeline li.move { padding: 4px 0; border-top: none; }
   .timeline li.move .t-time { color: transparent; }
@@ -790,6 +806,7 @@
   // ===== 일정 순서 드래그로 바꾸기 (편집 모드) =====
   (function(){
     const LS_ORDER = 'trip-order-v1';
+    const LS_HIDDEN = 'trip-hidden-v1';   // 삭제(숨김)된 항목 id 목록
 
     // 각 타임라인과 항목에 안정적인 ID 부여
     const timelines = [];
@@ -798,6 +815,8 @@
       tl.dataset.tl = tlId;
       Array.from(tl.children).forEach((li, li_i) => {
         if (!li.dataset.item) li.dataset.item = tlId + '-item-' + li_i;
+        // 이동 구간(.move)은 핸들/삭제 없음
+        if (li.classList.contains('move')) return;
         // 드래그 핸들 삽입 (맨 앞)
         if (!li.querySelector('.drag-handle')) {
           const h = document.createElement('span');
@@ -806,9 +825,44 @@
           h.title = '드래그해서 순서 바꾸기';
           li.insertBefore(h, li.firstChild);
         }
+        // 삭제 버튼 삽입 (맨 뒤)
+        if (!li.querySelector('.item-del')) {
+          const d = document.createElement('button');
+          d.className = 'item-del';
+          d.textContent = '🗑';
+          d.title = '이 일정 삭제';
+          d.addEventListener('click', (e)=>{ e.stopPropagation(); toggleHide(li); });
+          li.appendChild(d);
+        }
       });
       timelines.push(tl);
     });
+
+    // --- 삭제(숨김) 관리 ---
+    function getHidden(){ try { return JSON.parse(localStorage.getItem(LS_HIDDEN)||'[]'); } catch(e){ return []; } }
+    function setHidden(list){ localStorage.setItem(LS_HIDDEN, JSON.stringify(list)); }
+    function applyHidden(list){
+      document.querySelectorAll('.timeline li[data-item]').forEach(li => {
+        const hidden = list.includes(li.dataset.item);
+        li.classList.toggle('hidden-item', hidden);
+        const btn = li.querySelector('.item-del');
+        if (btn){ btn.textContent = hidden ? '↩' : '🗑'; btn.title = hidden ? '복구' : '이 일정 삭제'; btn.classList.toggle('restore', hidden); }
+      });
+    }
+    function toggleHide(li){
+      const id = li.dataset.item;
+      let list = getHidden();
+      if (list.includes(id)) list = list.filter(x=>x!==id);
+      else list.push(id);
+      setHidden(list);
+      applyHidden(list);
+      if (window.__tripCloudPush) window.__tripCloudPush();
+    }
+    // 외부(클라우드)에서 숨김목록 적용/수집
+    window.__applyHidden = function(list){ if (Array.isArray(list)){ setHidden(list); applyHidden(list); } };
+    window.__collectHidden = function(){ return getHidden(); };
+    // 로드 시 적용
+    applyHidden(getHidden());
 
     // --- 순서 저장/복원 ---
     function getOrder(){ try { return JSON.parse(localStorage.getItem(LS_ORDER)||'{}'); } catch(e){ return {}; } }
@@ -930,7 +984,8 @@
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=>{ checks['trip-check-'+i] = b.checked ? '1':'0'; });
       let memos = []; try { memos = JSON.parse(localStorage.getItem(LS_MEMOS)||'[]'); } catch(e){}
       const order = window.__collectOrder ? window.__collectOrder() : {};
-      return { edits, memos, checks, order };
+      const hidden = window.__collectHidden ? window.__collectHidden() : [];
+      return { edits, memos, checks, order, hidden };
     }
 
     // 클라우드에 저장 (디바운스)
@@ -965,6 +1020,9 @@
         if (data.order && window.__applyOrder){
           localStorage.setItem('trip-order-v1', JSON.stringify(data.order));
           window.__applyOrder(data.order);
+        }
+        if (data.hidden && window.__applyHidden){
+          window.__applyHidden(data.hidden);
         }
       } finally { applyingRemote = false; }
     }
@@ -1160,8 +1218,9 @@
 
     // --- 내 수정 초기화 ---
     document.getElementById('resetBtn').addEventListener('click', ()=>{
-      if (!confirm('내 수정/메모/체크를 모두 초기화할까요? (원본으로 돌아감)')) return;
+      if (!confirm('내 수정/메모/체크/순서/삭제를 모두 초기화할까요? (원본으로 돌아감)')) return;
       localStorage.removeItem(LS_EDITS); localStorage.removeItem(LS_MEMOS);
+      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-hidden-v1');
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=> localStorage.removeItem('trip-check-'+i));
       location.reload();
     });
