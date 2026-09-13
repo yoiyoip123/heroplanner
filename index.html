@@ -170,6 +170,19 @@
   .t-title { font-weight: 600; }
   .t-desc { font-size: 0.86rem; color: var(--muted); margin-top: 1px; }
   .t-emoji { margin-right: 5px; }
+
+  /* 드래그 핸들 (편집 모드에서만 보임) */
+  .drag-handle {
+    display: none; flex: 0 0 auto; align-self: center;
+    cursor: grab; color: var(--muted); font-size: 1.1rem;
+    padding: 0 2px; touch-action: none; user-select: none;
+  }
+  body.editing .timeline li:not(.move) .drag-handle { display: inline-flex; }
+  body.editing .timeline li.dragging {
+    background: #fffdf5; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    border-radius: 10px; opacity: 0.95;
+  }
+  .timeline li.drop-target { border-top: 2px solid var(--porto) !important; }
   /* 이동 구간 표시 */
   .timeline li.move { padding: 4px 0; border-top: none; }
   .timeline li.move .t-time { color: transparent; }
@@ -774,6 +787,110 @@
     });
   })();
 
+  // ===== 일정 순서 드래그로 바꾸기 (편집 모드) =====
+  (function(){
+    const LS_ORDER = 'trip-order-v1';
+
+    // 각 타임라인과 항목에 안정적인 ID 부여
+    const timelines = [];
+    document.querySelectorAll('.day .timeline').forEach((tl, ti) => {
+      const tlId = 'tl-' + ti;
+      tl.dataset.tl = tlId;
+      Array.from(tl.children).forEach((li, li_i) => {
+        if (!li.dataset.item) li.dataset.item = tlId + '-item-' + li_i;
+        // 드래그 핸들 삽입 (맨 앞)
+        if (!li.querySelector('.drag-handle')) {
+          const h = document.createElement('span');
+          h.className = 'drag-handle';
+          h.textContent = '⠿';
+          h.title = '드래그해서 순서 바꾸기';
+          li.insertBefore(h, li.firstChild);
+        }
+      });
+      timelines.push(tl);
+    });
+
+    // --- 순서 저장/복원 ---
+    function getOrder(){ try { return JSON.parse(localStorage.getItem(LS_ORDER)||'{}'); } catch(e){ return {}; } }
+    function saveOrder(){
+      const order = {};
+      timelines.forEach(tl => {
+        order[tl.dataset.tl] = Array.from(tl.children).map(li => li.dataset.item);
+      });
+      localStorage.setItem(LS_ORDER, JSON.stringify(order));
+      // 클라우드 동기화 (편집 엔진이 준비돼 있으면)
+      if (window.__tripCloudPush) window.__tripCloudPush();
+    }
+    // 외부(클라우드)에서 순서 적용
+    window.__applyOrder = function(order){
+      if (!order) return;
+      timelines.forEach(tl => {
+        const ids = order[tl.dataset.tl];
+        if (!Array.isArray(ids)) return;
+        ids.forEach(id => {
+          const el = tl.querySelector('[data-item="'+id+'"]');
+          if (el) tl.appendChild(el); // 순서대로 뒤에 붙이면 재정렬됨
+        });
+      });
+    };
+    window.__collectOrder = function(){
+      const order = {};
+      timelines.forEach(tl => { order[tl.dataset.tl] = Array.from(tl.children).map(li => li.dataset.item); });
+      return order;
+    };
+    // 로드 시 저장된 순서 적용
+    window.__applyOrder(getOrder());
+
+    // --- Pointer 기반 드래그 (PC + 모바일) ---
+    let dragging = null, startY = 0, curTL = null;
+
+    function onDown(e){
+      const handle = e.target.closest('.drag-handle');
+      if (!handle) return;
+      if (!document.body.classList.contains('editing')) return;
+      const li = handle.closest('li');
+      if (!li) return;
+      e.preventDefault();
+      dragging = li; curTL = li.parentElement;
+      li.classList.add('dragging');
+      startY = e.clientY;
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+    }
+
+    function onMove(e){
+      if (!dragging) return;
+      e.preventDefault();
+      // 커서 위치의 형제 항목 찾기
+      const siblings = Array.from(curTL.children).filter(c => c !== dragging && !c.classList.contains('move') ? true : c !== dragging);
+      let placed = false;
+      for (const sib of Array.from(curTL.children)) {
+        if (sib === dragging) continue;
+        const rect = sib.getBoundingClientRect();
+        const mid = rect.top + rect.height / 2;
+        if (e.clientY < mid) {
+          if (sib.previousElementSibling !== dragging) curTL.insertBefore(dragging, sib);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) curTL.appendChild(dragging); // 맨 아래로
+    }
+
+    function onUp(){
+      if (!dragging) return;
+      dragging.classList.remove('dragging');
+      dragging = null; curTL = null;
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      saveOrder();
+      const t = document.querySelector('.save-toast');
+      // 간단 안내
+    }
+
+    document.addEventListener('pointerdown', onDown);
+  })();
+
   // 체크박스 상태를 브라우저에 저장 (웅희도 각자 기기에서 체크 가능)
   (function(){
     const boxes = document.querySelectorAll('.check input[type="checkbox"]');
@@ -806,13 +923,14 @@
       } catch(e){ console.warn('Supabase init 실패', e); }
     }
 
-    // 현재 상태(edits/memos/checks)를 한 덩어리로 모으기
+    // 현재 상태(edits/memos/checks/order)를 한 덩어리로 모으기
     function snapshot(){
       let edits = {}; try { edits = JSON.parse(localStorage.getItem(LS_EDITS)||'{}'); } catch(e){}
       const checks = {};
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=>{ checks['trip-check-'+i] = b.checked ? '1':'0'; });
       let memos = []; try { memos = JSON.parse(localStorage.getItem(LS_MEMOS)||'[]'); } catch(e){}
-      return { edits, memos, checks };
+      const order = window.__collectOrder ? window.__collectOrder() : {};
+      return { edits, memos, checks, order };
     }
 
     // 클라우드에 저장 (디바운스)
@@ -828,6 +946,8 @@
         else { cloudDot(true); }
       }, 400);
     }
+    // 드래그 순서변경 등 외부에서 클라우드 저장을 호출할 수 있게 노출
+    window.__tripCloudPush = function(){ cloudPush(); toast(CLOUD_ON ? '순서 저장 & 동기화됨 ☁️' : '순서 저장됨 💾'); };
 
     // 클라우드에서 받은 상태를 화면/로컬에 반영
     function applyCloud(data){
@@ -841,6 +961,10 @@
             const v = data.checks['trip-check-'+i];
             if (v !== undefined){ b.checked = v==='1'; localStorage.setItem('trip-check-'+i, v); b.nextElementSibling.classList.toggle('done', b.checked); }
           });
+        }
+        if (data.order && window.__applyOrder){
+          localStorage.setItem('trip-order-v1', JSON.stringify(data.order));
+          window.__applyOrder(data.order);
         }
       } finally { applyingRemote = false; }
     }
@@ -929,8 +1053,8 @@
       document.querySelectorAll('.check input[type="checkbox"]').forEach(b => { b.disabled = on; });
       editToggle.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';
       editToggle.classList.toggle('on', on);
-      if (on) toast('편집 모드예요. 일정·준비물·주의사항 글자를 눌러 수정하세요');
-      else toast('편집 끝! 이제 체크박스도 다시 눌러져요');
+      if (on) toast('편집 모드! 글자 수정 + ⠿ 잡고 위아래로 순서 바꾸기');
+      else toast('편집 끝! 이제 체크박스·지도도 다시 눌러져요');
     }
     editToggle.addEventListener('click', ()=> setEditing(!editing));
 
