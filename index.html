@@ -331,6 +331,8 @@
     background: var(--card); transition: all 0.15s;
   }
   .docs-drop:hover, .docs-drop.dragover { border-color: var(--porto); background: var(--porto-soft); color: var(--porto); }
+  .docs-drop.uploading { opacity: 0.6; pointer-events: none; }
+  .docs-drop.uploading::after { content: " ⏳ 업로드 중..."; font-weight: 700; }
   .docs-drop b { color: var(--porto); }
   .docs-list { list-style: none; padding: 0; margin: 12px 0 0; }
   .docs-list li {
@@ -826,7 +828,7 @@
   </div>
   <input type="file" id="docsInput" accept="image/*,application/pdf" multiple style="display:none" />
   <ul class="docs-list" id="docsList"></ul>
-  <p class="docs-note">🔒 올린 파일은 <b>이 기기(브라우저)에만</b> 저장돼요. 웅희랑 나눠 보려면 카톡으로 파일을 직접 보내거나 각자 올리면 돼요. (민감한 개인정보라 안전하게 기기 저장 방식이에요)</p>
+  <p class="docs-note">☁️ 올린 파일은 <b>실시간 공유</b>돼요 — 하이리·웅희 둘 다 봐요! (상대가 올린 건 자동으로 목록에 떠요) ⚠️ 링크 아는 사람은 접근 가능하니 아주 민감한 서류는 주의.</p>
 
   <!-- MEMO / 함께 쓰는 메모 -->
   <h2 class="section-title" id="memo">📝 함께 쓰는 메모</h2>
@@ -872,107 +874,111 @@
     const listEl = document.getElementById('docsList');
     if (!drop || !input || !listEl) return;
 
-    // --- IndexedDB 열기 ---
-    let db = null;
-    const req = indexedDB.open('trip-docs', 1);
-    req.onupgradeneeded = (e) => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains('files')) d.createObjectStore('files', { keyPath: 'id' });
-    };
-    req.onsuccess = (e) => { db = e.target.result; renderList(); };
-    req.onerror = () => { listEl.innerHTML = '<li>저장소를 열 수 없어요 😢</li>'; };
-
-    function tx(mode){ return db.transaction('files', mode).objectStore('files'); }
-
-    function addFile(file){
-      const reader = new FileReader();
-      reader.onload = () => {
-        const rec = {
-          id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          added: new Date().toISOString(),
-          data: reader.result   // ArrayBuffer
-        };
-        const store = tx('readwrite');
-        store.add(rec);
-        store.transaction.oncomplete = renderList;
-      };
-      reader.readAsArrayBuffer(file);
+    const CFG = window.TRIP_SYNC || {};
+    const CLOUD_ON = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase);
+    const BUCKET = 'docs';
+    const FOLDER = (CFG.ROOM || 'trip');   // 방별 폴더로 구분
+    let sb = null;
+    if (CLOUD_ON) {
+      try { sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY); }
+      catch(e){ console.warn('docs supabase init 실패', e); }
     }
 
-    function delFile(id){
-      const store = tx('readwrite');
-      store.delete(id);
-      store.transaction.oncomplete = renderList;
+    // 클라우드 미설정 시 안내만
+    if (!sb) {
+      listEl.innerHTML = '<li style="justify-content:center;color:var(--muted);font-size:.85rem;">클라우드 연결이 안 돼 있어요. (Supabase 설정 필요)</li>';
+      drop.addEventListener('click', ()=> alert('실시간 공유 저장소(Supabase)가 연결돼 있지 않아요.'));
+      return;
     }
 
-    function openFile(rec){
-      const blob = new Blob([rec.data], { type: rec.type || 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      // 메모리 정리(잠시 후)
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    }
-
-    function iconFor(type){
-      if (!type) return '📄';
-      if (type.startsWith('image/')) return '🖼️';
-      if (type === 'application/pdf') return '📕';
+    function iconFor(name){
+      const ext = (name.split('.').pop()||'').toLowerCase();
+      if (['jpg','jpeg','png','gif','webp','heic'].includes(ext)) return '🖼️';
+      if (ext === 'pdf') return '📕';
       return '📄';
     }
     function fmtSize(b){
+      if (!b) return '';
       if (b < 1024) return b + ' B';
       if (b < 1024*1024) return (b/1024).toFixed(0) + ' KB';
       return (b/1024/1024).toFixed(1) + ' MB';
     }
-
-    function renderList(){
-      if (!db) return;
-      const store = tx('readonly');
-      const all = store.getAll();
-      all.onsuccess = () => {
-        const recs = all.result.sort((a,b)=> (a.added<b.added?1:-1));
-        listEl.innerHTML = '';
-        if (!recs.length){
-          listEl.innerHTML = '<li style="justify-content:center;color:var(--muted);font-size:.85rem;">아직 올린 파일이 없어요</li>';
-          return;
-        }
-        recs.forEach(rec => {
-          const li = document.createElement('li');
-          const icon = document.createElement('span'); icon.className='d-icon'; icon.textContent = iconFor(rec.type);
-          const info = document.createElement('div'); info.className='d-info';
-          const nm = document.createElement('div'); nm.className='d-name';
-          const a = document.createElement('a'); a.href='#'; a.textContent = rec.name;
-          a.addEventListener('click', (e)=>{ e.preventDefault(); openFile(rec); });
-          nm.appendChild(a);
-          const meta = document.createElement('div'); meta.className='d-meta';
-          meta.textContent = fmtSize(rec.size) + ' · ' + new Date(rec.added).toLocaleDateString('ko-KR');
-          info.appendChild(nm); info.appendChild(meta);
-          const openBtn = document.createElement('button'); openBtn.className='d-open'; openBtn.textContent='열기';
-          openBtn.addEventListener('click', ()=> openFile(rec));
-          const del = document.createElement('button'); del.className='d-del'; del.textContent='🗑'; del.title='삭제';
-          del.addEventListener('click', ()=>{ if(confirm('이 파일을 삭제할까요?')) delFile(rec.id); });
-          li.appendChild(icon); li.appendChild(info); li.appendChild(openBtn); li.appendChild(del);
-          listEl.appendChild(li);
-        });
-      };
+    function publicUrl(path){
+      return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
     }
 
-    // --- 업로드 트리거 ---
+    async function uploadFile(file){
+      // 안전한 파일명: 타임스탬프_랜덤_원본명
+      const safe = file.name.replace(/[^\w.\-가-힣]/g,'_');
+      const path = FOLDER + '/' + Date.now() + '-' + Math.random().toString(36).slice(2,6) + '_' + safe;
+      drop.classList.add('uploading');
+      const { error } = await sb.storage.from(BUCKET).upload(path, file, {
+        cacheControl: '3600', upsert: false, contentType: file.type || undefined
+      });
+      drop.classList.remove('uploading');
+      if (error) { alert('업로드 실패: ' + error.message); return; }
+      renderList();
+    }
+
+    async function delFile(path){
+      if (!confirm('이 파일을 삭제할까요? (웅희 화면에서도 사라져요)')) return;
+      const { error } = await sb.storage.from(BUCKET).remove([path]);
+      if (error) { alert('삭제 실패: ' + error.message); return; }
+      renderList();
+    }
+
+    async function renderList(){
+      const { data, error } = await sb.storage.from(BUCKET).list(FOLDER, {
+        limit: 100, sortBy: { column: 'created_at', order: 'desc' }
+      });
+      listEl.innerHTML = '';
+      if (error) { listEl.innerHTML = '<li style="color:var(--bcn);">목록 오류: '+error.message+'</li>'; return; }
+      const files = (data||[]).filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+      if (!files.length) {
+        listEl.innerHTML = '<li style="justify-content:center;color:var(--muted);font-size:.85rem;">아직 올린 파일이 없어요</li>';
+        return;
+      }
+      files.forEach(f => {
+        const path = FOLDER + '/' + f.name;
+        // 표시용 이름: 접두어(타임스탬프_랜덤_) 제거
+        const displayName = f.name.replace(/^\d+-[a-z0-9]+_/, '');
+        const url = publicUrl(path);
+        const size = f.metadata && f.metadata.size;
+
+        const li = document.createElement('li');
+        const icon = document.createElement('span'); icon.className='d-icon'; icon.textContent = iconFor(f.name);
+        const info = document.createElement('div'); info.className='d-info';
+        const nm = document.createElement('div'); nm.className='d-name';
+        const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.textContent = displayName;
+        nm.appendChild(a);
+        const meta = document.createElement('div'); meta.className='d-meta';
+        meta.textContent = (fmtSize(size) ? fmtSize(size)+' · ' : '') + '☁️ 공유됨';
+        info.appendChild(nm); info.appendChild(meta);
+        const openBtn = document.createElement('a'); openBtn.className='d-open'; openBtn.textContent='열기';
+        openBtn.href = url; openBtn.target='_blank'; openBtn.rel='noopener';
+        const del = document.createElement('button'); del.className='d-del'; del.textContent='🗑'; del.title='삭제';
+        del.addEventListener('click', ()=> delFile(path));
+        li.appendChild(icon); li.appendChild(info); li.appendChild(openBtn); li.appendChild(del);
+        listEl.appendChild(li);
+      });
+    }
+
+    // 업로드 트리거
     drop.addEventListener('click', ()=> input.click());
     input.addEventListener('change', ()=>{
-      Array.from(input.files).forEach(addFile);
+      Array.from(input.files).forEach(uploadFile);
       input.value = '';
     });
-    // 드래그앤드롭
     ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('dragover'); }));
     ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('dragover'); }));
     drop.addEventListener('drop', e=>{
       const files = e.dataTransfer && e.dataTransfer.files;
-      if (files) Array.from(files).forEach(addFile);
+      if (files) Array.from(files).forEach(uploadFile);
     });
+
+    // 최초 로드 + 주기적 새로고침(상대가 올린 파일 반영)
+    renderList();
+    setInterval(renderList, 20000);
   })();
 
   // ===== 각 일정 블록(항목 전체)을 누르면 구글맵으로 이동 =====
