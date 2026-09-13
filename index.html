@@ -248,12 +248,17 @@
   .mymap .mm-cap { padding: 8px 14px; font-size: 0.8rem; color: var(--muted); }
   .mymap .mm-cap a { color: var(--porto); font-weight: 600; text-decoration: none; }
 
-  /* 제목을 지도 링크로 (누르면 구글맵 이동) */
-  a.t-link { text-decoration: none; color: inherit; }
-  a.t-link:hover .t-title { color: var(--porto); text-decoration: underline; }
-  a.t-link .t-title::after {
-    content: " 📍"; font-size: 0.8rem; opacity: 0.6;
+  /* 블록 전체를 누르면 구글맵으로 이동 */
+  .timeline li.has-map { cursor: pointer; border-radius: 8px; transition: background 0.12s; }
+  .timeline li.has-map:hover { background: var(--porto-soft); }
+  .timeline li.has-map:active { background: #dcebf5; }
+  .timeline li.has-map .t-title::after {
+    content: " 📍"; font-size: 0.78rem; opacity: 0.5;
   }
+  /* 편집 모드에선 클릭 안내/호버 끄기 */
+  body.editing .timeline li.has-map { cursor: text; }
+  body.editing .timeline li.has-map:hover { background: transparent; }
+  body.editing .timeline li.has-map .t-title::after { content: ""; }
 
   .maplink {
     display: inline-block; font-size: 0.78rem; color: var(--porto);
@@ -733,13 +738,13 @@
 </div>
 
 <script>
-  // ===== 각 일정 제목을 구글맵 링크로 자동 연결 =====
+  // ===== 각 일정 블록(항목 전체)을 누르면 구글맵으로 이동 =====
   (function(){
     document.querySelectorAll('.timeline li').forEach(li => {
+      // 이동 구간(🚆 ~분)은 지도 불필요 → 제외
+      if (li.classList.contains('move')) return;
       const titleEl = li.querySelector('.t-title');
       if (!titleEl) return;
-      // 이미 링크로 감싸져 있으면 skip
-      if (titleEl.closest('a.t-link')) return;
 
       // 1) 항목에 이미 있는 📍지도 링크(maplink)의 목적지를 우선 사용
       let href = null;
@@ -748,26 +753,24 @@
 
       // 2) 없으면 제목 텍스트로 구글맵 검색 링크 자동 생성
       if (!href) {
-        // 이모지·괄호설명 제거하고 핵심 장소명만 추출
         let q = titleEl.textContent.replace(/📍/g,'').trim();
-        // 괄호 안 영문명이 있으면 그걸 우선 (예: 구엘 공원 (Park Güell))
         const paren = q.match(/\(([^)]+)\)/);
         if (paren && /[A-Za-z]/.test(paren[1])) q = paren[1].trim();
         else q = q.replace(/\([^)]*\)/g,'').trim();
-        // 이모지 제거
         q = q.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu,'').trim();
         if (!q) return;
         href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
       }
 
-      // 제목을 링크로 감싸기
-      const a = document.createElement('a');
-      a.className = 't-link';
-      a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      titleEl.parentNode.insertBefore(a, titleEl);
-      a.appendChild(titleEl);
+      // 블록 전체를 클릭 가능하게
+      li.classList.add('has-map');
+      li.dataset.map = href;
+      li.addEventListener('click', (e) => {
+        // 편집 모드거나, 안에 있는 링크/체크박스를 직접 눌렀으면 무시
+        if (document.body.classList.contains('editing')) return;
+        if (e.target.closest('a') || e.target.closest('input')) return;
+        window.open(href, '_blank', 'noopener');
+      });
     });
   })();
 
@@ -916,18 +919,12 @@
     // --- 편집 모드 토글 ---
     const editToggle = document.getElementById('editToggle');
     let editing = false;
-    function preventLink(e){ e.preventDefault(); }
     function setEditing(on){
       editing = on;
       document.body.classList.toggle('editing', on);
       fields.forEach(f => f.el.setAttribute('contenteditable', on ? 'true' : 'false'));
       // 편집 모드에선 체크박스 토글 잠금 (글자 수정에 집중 / 실수 방지)
       document.querySelectorAll('.check input[type="checkbox"]').forEach(b => { b.disabled = on; });
-      // 편집 모드에선 제목의 지도 링크 클릭 막기 (제목 수정 위해)
-      document.querySelectorAll('a.t-link').forEach(a => {
-        if (on) a.addEventListener('click', preventLink);
-        else a.removeEventListener('click', preventLink);
-      });
       editToggle.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';
       editToggle.classList.toggle('on', on);
       if (on) toast('편집 모드예요. 일정·준비물·주의사항 글자를 눌러 수정하세요');
