@@ -1266,17 +1266,27 @@
     function getAdded(){ try { return JSON.parse(localStorage.getItem(LS_ADDED)||'[]'); } catch(e){ return []; } }
     function setAdded(list){ localStorage.setItem(LS_ADDED, JSON.stringify(list)); }
 
-    // 새 li 요소 만들기 (핸들 + 편집필드 + 삭제버튼)
+    // 새 li 요소 만들기 (완료체크 + 핸들 + 편집필드 + 삭제버튼)
     function buildItem(itemId){
       const li = document.createElement('li');
       li.dataset.item = itemId;
       li.innerHTML =
-        '<span class="drag-handle" title="드래그해서 순서 바꾸기">⠿</span>' +
         '<span class="t-time">시간</span>' +
         '<div class="t-body">' +
           '<div class="t-title"><span class="t-emoji">📍</span>새 일정</div>' +
           '<div class="t-desc">설명을 입력하세요</div>' +
         '</div>';
+      // 완료 체크박스 (맨 앞)
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.className = 't-check'; cb.title = '완료 표시';
+      cb.addEventListener('click', (e)=> e.stopPropagation());
+      cb.addEventListener('change', ()=> toggleDone(itemId, cb.checked));
+      li.insertBefore(cb, li.firstChild);
+      // 드래그 핸들
+      const h = document.createElement('span');
+      h.className = 'drag-handle'; h.textContent = '⠿'; h.title = '드래그해서 순서 바꾸기';
+      li.insertBefore(h, li.firstChild);
+      // 삭제 버튼
       const d = document.createElement('button');
       d.className = 'item-del'; d.textContent = '🗑'; d.title = '이 일정 삭제';
       d.addEventListener('click', (e)=>{ e.stopPropagation(); toggleHide(itemId); });
@@ -1286,13 +1296,14 @@
 
     // 타임라인에 항목 붙이고 편집 가능하게 등록
     function attachItem(tl, li){
-      // "➕ 추가" 버튼이 있으면 그 앞에 삽입
-      const addBtn = tl.parentElement.querySelector('.add-item-btn');
       tl.appendChild(li);
       // 편집 필드 등록 (편집 엔진이 준비돼 있으면)
       if (window.__registerEditable) {
         li.querySelectorAll('.t-time, .t-title, .t-desc').forEach(el => window.__registerEditable(el, li.dataset.item));
       }
+      // 완료/삭제 상태 반영
+      const doneList = getDone(); if (doneList.includes(li.dataset.item)){ li.classList.add('done-item'); const c=li.querySelector('.t-check'); if(c) c.checked=true; }
+      const hiddenList = getHidden(); if (hiddenList.includes(li.dataset.item)){ li.classList.add('hidden-item'); const b=li.querySelector('.item-del'); if(b){ b.textContent='↩'; b.classList.add('restore'); } }
     }
 
     // 추가 버튼을 각 날짜에 삽입
