@@ -171,6 +171,17 @@
   .t-desc { font-size: 0.86rem; color: var(--muted); margin-top: 1px; }
   .t-emoji { margin-right: 5px; }
 
+  /* 일정 완료 체크박스 */
+  .t-check {
+    flex: 0 0 auto; align-self: center;
+    width: 20px; height: 20px; margin: 0 2px 0 0;
+    accent-color: var(--porto); cursor: pointer;
+  }
+  .timeline li.done-item .t-title,
+  .timeline li.done-item .t-desc { text-decoration: line-through; color: var(--muted); }
+  .timeline li.done-item .t-time { text-decoration: line-through; opacity: 0.6; }
+  .timeline li.done-item { opacity: 0.72; }
+
   /* 명소 안으로 합쳐진 이동시간 */
   .move-inline { margin-top: 6px; }
   .move-inline .move-tag {
@@ -191,6 +202,8 @@
     background: #fffdf5; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     border-radius: 10px; opacity: 0.95;
   }
+  /* 드래그로 다른 날짜에 놓을 때 그 날짜 하이라이트 */
+  .timeline.tl-drop { background: var(--porto-soft); border-radius: 10px; outline: 2px dashed var(--porto); outline-offset: 2px; }
 
   /* 항목 삭제 버튼 (편집 모드에서만 보임) */
   .item-del {
@@ -485,7 +498,7 @@
 <header class="hero">
   <div class="flags">🇪🇸 ✈️ 🇵🇹</div>
   <h1>바르셀로나 &amp; 포르투 여행</h1>
-  <div class="dates">2026. 9. 24 (목) — 10. 2 (금)</div>
+  <div class="dates">2026. 9. 24 (목) — 10. 4 (토)</div>
   <div class="sub">9/24 나 혼자 도착 · 9/25 웅희 합류 🎉</div>
 </header>
 
@@ -528,7 +541,7 @@
       <ul>
         <li>9/28 16:45 바르셀로나 → 포르투</li>
         <li>10/1 12:00 포르투 → 바르셀로나</li>
-        <li>10/2 13:00 바르셀로나 → 시애틀</li>
+        <li>10/4 13:00 바르셀로나 → 시애틀</li>
       </ul>
     </div>
   </div>
@@ -585,8 +598,8 @@
     <div class="check">
       <h4>✈️ 항공 · 숙소 · 교통</h4>
       <label><input type="checkbox"><span>바르셀로나↔포르투 항공권 확인 (9/28, 10/1)</span></label>
-      <label><input type="checkbox"><span>바르셀로나→시애틀 항공권 (10/2 13:00)</span></label>
-      <label><input type="checkbox"><span>Arcelon Hotel 예약 확인 (9/24~28, 10/1~2)</span></label>
+      <label><input type="checkbox"><span>바르셀로나→시애틀 항공권 (10/4 · 변경됨!)</span></label>
+      <label><input type="checkbox"><span>Arcelon Hotel 예약 확인 (9/24~28, 10/1~4 · 연장!)</span></label>
       <label><input type="checkbox"><span>chic&basic Gravity 예약 확인 (9/28~10/1)</span></label>
       <label><input type="checkbox"><span>공항 픽업/교통편 (필요시)</span></label>
     </div>
@@ -725,14 +738,36 @@
 
   <!-- BARCELONA PART 2 -->
   <h2 class="section-title" id="bcn2"><span class="pin bcn"></span>바르셀로나 ② · 귀국</h2>
-  <p class="section-note">10/1 ~ 10/2 · Arcelon Hotel 숙박</p>
+  <p class="section-note">10/1 ~ 10/4 · Arcelon Hotel 숙박</p>
+
+  <div class="day">
+    <div class="day-head"><span class="day-date">10/2 목</span><span class="day-tag">🏖️ 바르셀로나 여유</span></div>
+    <ul class="timeline">
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🏖️</span>바르셀로네타 해변 &amp; 아침 산책</div><div class="t-desc">시내에서 가까운 해변. 해변 산책 + 카페 아침. ⏱️ 오전 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Barceloneta+Beach+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚶 해변→보른/고딕 지구 · 도보 약 15분</span></div></li>
+      <li><span class="t-time">낮</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍤</span>해산물 점심 (바르셀로네타)</div><div class="t-desc">해변가 파에야·해산물 맛집. 여유롭게.</div></div></li>
+      <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚇 시내→벙커 전망대(El Carmel) · 지하철+도보 약 30분</span></div></li>
+      <li><span class="t-time">오후</span><div class="t-body"><div class="t-title"><span class="t-emoji">🌆</span>벙커 전망대 (Bunkers del Carmel)</div><div class="t-desc">바르셀로나 360도 파노라마 뷰. 현지인들의 노을 명소. ⏱️ 약 1시간 · 💶 무료</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Bunkers+del+Carmel+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍷</span>그라시아 지구 저녁</div><div class="t-desc">현지 분위기 물씬한 그라시아 골목에서 타파스 저녁.</div></div></li>
+    </ul>
+  </div>
+
+  <div class="day">
+    <div class="day-head"><span class="day-date">10/3 금</span><span class="day-tag">🚄 근교 or 시내 마무리</span></div>
+    <p class="section-note" style="padding:0 18px;margin:4px 0 0;">※ 근교 당일치기(지로나·피게레스)로 갈지, 시내에서 여유롭게 마무리할지 골라요.</p>
+    <ul class="timeline">
+      <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🚄</span>지로나 &amp; 피게레스 근교 (선택 A)</div><div class="t-desc">고속열차로 지로나(왕좌의게임 촬영지) + 피게레스 달리 미술관. 당일치기. ⏱️ 종일 · 💶 기차+입장 €40~ (달리 미술관 예약 권장)</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Girona+Spain" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">또는</span><div class="t-body"><div class="t-title"><span class="t-emoji">🎡</span>티비다보 &amp; 시내 쇼핑 (선택 B)</div><div class="t-desc">티비다보 놀이공원+전망, 또는 시내 쇼핑·못 간 명소 여유롭게. 마지막 전날이라 무리 없이.</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=Tibidabo+Barcelona" target="_blank">📍 지도</a></div></li>
+      <li><span class="t-time">저녁</span><div class="t-body"><div class="t-title"><span class="t-emoji">🍽️</span>마지막 밤 특별한 저녁</div><div class="t-desc">여행 마무리 디너. 미리 예약 추천(분위기 좋은 곳). 짐 정리도!</div></div></li>
+    </ul>
+  </div>
 
   <div class="day flight">
-    <div class="day-head"><span class="day-date">10/2 목</span><span class="day-tag">✈️ 시애틀行</span></div>
+    <div class="day-head"><span class="day-date">10/4 토</span><span class="day-tag">✈️ 시애틀行</span></div>
     <ul class="timeline">
       <li><span class="t-time">오전</span><div class="t-body"><div class="t-title"><span class="t-emoji">🛍️</span>마지막 오전 &amp; 체크아웃</div><div class="t-desc">기념품 쇼핑 / 카페. 국제선 → 최소 3시간 전 공항 도착 권장(늦어도 10:00).</div></div></li>
       <li class="move"><span class="t-time"></span><div class="t-body"><span class="move-tag">🚕 호텔→바르셀로나 공항 · 약 30~40분 (택시/공항철도)</span></div></li>
-      <li><span class="t-time">13:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 → 시애틀 출발</div><div class="t-desc">즐거운 귀국길! ✨</div></div></li>
+      <li><span class="t-time">13:00</span><div class="t-body"><div class="t-title"><span class="t-emoji">✈️</span>바르셀로나 → 시애틀 출발</div><div class="t-desc">즐거운 귀국길! ✨ (출발 시간 확인해서 수정하세요)</div></div></li>
     </ul>
   </div>
 
@@ -1048,6 +1083,14 @@
       tl.dataset.tl = tlId;
       Array.from(tl.children).forEach((li, li_i) => {
         if (!li.dataset.item) li.dataset.item = tlId + '-item-' + li_i;
+        // 완료 체크박스 (맨 앞) — 편집 모드 아니어도 체크 가능
+        if (!li.querySelector('.t-check')) {
+          const cb = document.createElement('input');
+          cb.type = 'checkbox'; cb.className = 't-check'; cb.title = '완료 표시';
+          cb.addEventListener('click', (e)=> e.stopPropagation());
+          cb.addEventListener('change', ()=> toggleDone(li.dataset.item, cb.checked));
+          li.insertBefore(cb, li.firstChild);
+        }
         if (!li.querySelector('.drag-handle')) {
           const h = document.createElement('span');
           h.className = 'drag-handle'; h.textContent = '⠿'; h.title = '드래그해서 순서 바꾸기';
@@ -1062,6 +1105,29 @@
       });
       timelines.push(tl);
     });
+
+    // --- 일정 완료 체크 관리 ---
+    const LS_DONE = 'trip-done-v1';
+    function getDone(){ try { return JSON.parse(localStorage.getItem(LS_DONE)||'[]'); } catch(e){ return []; } }
+    function setDone(list){ localStorage.setItem(LS_DONE, JSON.stringify(list)); }
+    function applyDone(list){
+      document.querySelectorAll('.timeline li[data-item]').forEach(li => {
+        const done = list.includes(li.dataset.item);
+        li.classList.toggle('done-item', done);
+        const cb = li.querySelector('.t-check');
+        if (cb) cb.checked = done;
+      });
+    }
+    function toggleDone(id, checked){
+      let list = getDone();
+      if (checked) { if (!list.includes(id)) list.push(id); }
+      else { list = list.filter(x=>x!==id); }
+      setDone(list); applyDone(list);
+      if (window.__tripCloudPush) window.__tripCloudPush();
+    }
+    window.__applyDone = function(list){ if (Array.isArray(list)){ setDone(list); applyDone(list); } };
+    window.__collectDone = function(){ return getDone(); };
+    applyDone(getDone());
 
     // 2-b) 일정 외 삭제 대상: 체크리스트 항목 · 주의사항(팁/경고) · 숙소카드 · 정보카드
     //      → 편집 가능한 거의 모든 블록에 삭제 버튼을 붙임
@@ -1126,7 +1192,11 @@
       timelines.forEach(tl => {
         const ids = order[tl.dataset.tl];
         if (!Array.isArray(ids)) return;
-        ids.forEach(id => { const el = tl.querySelector('[data-item="'+id+'"]'); if (el) tl.appendChild(el); });
+        ids.forEach(id => {
+          // 문서 전체에서 항목을 찾아 이 타임라인으로 이동 (다른 날짜에서 옮겨온 것도 반영)
+          const el = document.querySelector('.timeline [data-item="'+id+'"]');
+          if (el) tl.appendChild(el);
+        });
       });
     };
     window.__collectOrder = function(){
@@ -1140,35 +1210,51 @@
     applyHidden(getHidden());
 
     // --- Pointer 드래그 (PC + 모바일) ---
-    let dragging = null, curTL = null;
+    let dragging = null;
     function onDown(e){
       const handle = e.target.closest('.drag-handle');
       if (!handle || !document.body.classList.contains('editing')) return;
       const li = handle.closest('li'); if (!li) return;
       e.preventDefault();
-      dragging = li; curTL = li.parentElement;
+      dragging = li;
       li.classList.add('dragging');
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
     }
+    // 커서 y좌표가 어느 타임라인 위에 있는지 찾기 (날짜 넘나들기용)
+    function timelineAt(y){
+      let found = null;
+      timelines.forEach(tl => {
+        const r = tl.getBoundingClientRect();
+        // 타임라인 영역(위아래 약간 여유) 안에 커서가 있으면
+        if (y >= r.top - 40 && y <= r.bottom + 40) found = tl;
+      });
+      return found;
+    }
     function onMove(e){
       if (!dragging) return;
       e.preventDefault();
+      // 1) 커서가 올라간 타임라인(날짜) 찾기 — 다른 날짜면 그쪽으로 이동
+      const targetTL = timelineAt(e.clientY) || dragging.parentElement;
+      // 이동 대상 날짜 하이라이트
+      timelines.forEach(tl => tl.classList.toggle('tl-drop', tl === targetTL));
+      // 2) 그 타임라인 안에서 위치 잡기
       let placed = false;
-      for (const sib of Array.from(curTL.children)) {
+      for (const sib of Array.from(targetTL.children)) {
         if (sib === dragging) continue;
         const rect = sib.getBoundingClientRect();
         if (e.clientY < rect.top + rect.height/2) {
-          if (sib.previousElementSibling !== dragging) curTL.insertBefore(dragging, sib);
+          targetTL.insertBefore(dragging, sib);
           placed = true; break;
         }
       }
-      if (!placed) curTL.appendChild(dragging);
+      if (!placed) targetTL.appendChild(dragging);
     }
     function onUp(){
       if (!dragging) return;
       dragging.classList.remove('dragging');
-      dragging = null; curTL = null;
+      timelines.forEach(tl => tl.classList.remove('tl-drop'));
+      dragging = null;
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerup', onUp);
       saveOrder();
@@ -1286,7 +1372,8 @@
       const hidden = window.__collectHidden ? window.__collectHidden() : [];
       const order = window.__collectOrder ? window.__collectOrder() : {};
       const added = window.__collectAdded ? window.__collectAdded() : [];
-      return { edits, memos, checks, hidden, order, added };
+      const done = window.__collectDone ? window.__collectDone() : [];
+      return { edits, memos, checks, hidden, order, added, done };
     }
 
     // 클라우드에 저장 (디바운스)
@@ -1326,6 +1413,9 @@
         if (data.order && window.__applyOrder){
           localStorage.setItem('trip-order-v2', JSON.stringify(data.order));
           window.__applyOrder(data.order);
+        }
+        if (data.done && window.__applyDone){
+          window.__applyDone(data.done);
         }
       } finally { applyingRemote = false; }
     }
@@ -1423,7 +1513,7 @@
       document.querySelectorAll('.check input[type="checkbox"]').forEach(b => { b.disabled = on; });
       editToggle.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';
       editToggle.classList.toggle('on', on);
-      if (on) toast('편집 모드! 글자 수정 · ⠿ 드래그로 순서 · 🗑 삭제');
+      if (on) toast('편집 모드! ⠿ 드래그로 다른 날짜까지 이동 · 글자수정 · 🗑삭제');
       else toast('편집 끝! 이제 체크박스·지도도 다시 눌러져요');
     }
     editToggle.addEventListener('click', ()=> setEditing(!editing));
@@ -1555,7 +1645,7 @@
       if (!confirm('모든 수정/메모/체크/순서/삭제를 원본으로 되돌릴까요?\n(웅희 화면도 함께 원본으로 돌아가요)')) return;
       // 로컬 삭제
       localStorage.removeItem(LS_EDITS); localStorage.removeItem(LS_MEMOS);
-      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-order-v2'); localStorage.removeItem('trip-hidden-v1'); localStorage.removeItem('trip-added-v1');
+      localStorage.removeItem('trip-order-v1'); localStorage.removeItem('trip-order-v2'); localStorage.removeItem('trip-hidden-v1'); localStorage.removeItem('trip-added-v1'); localStorage.removeItem('trip-done-v1');
       document.querySelectorAll('.check input[type="checkbox"]').forEach((b,i)=> localStorage.removeItem('trip-check-'+i));
       // 클라우드도 빈 상태로 밀어서 다시 덮어써지지 않게
       if (sb) {
@@ -1621,7 +1711,7 @@
       },
       {
         keys: ['비행기','항공','비행','flight','출발','도착','몇시 비행','언제 가'],
-        a: '✈️ 항공 일정:\n\n• 9/28 16:45 바르셀로나 → 포르투 (약 2시간, 포르투가 1시간 느림)\n• 10/1 12:00 포르투 → 바르셀로나 (약 15시 도착)\n• 10/2 13:00 바르셀로나 → 시애틀\n\n국제선은 최소 2~3시간 전 공항 도착 권장!'
+        a: '✈️ 항공 일정:\n\n• 9/28 16:45 바르셀로나 → 포르투 (약 2시간, 포르투가 1시간 느림)\n• 10/1 12:00 포르투 → 바르셀로나 (약 15시 도착)\n• 10/4 바르셀로나 → 시애틀 (출국일 변경됨!)\n\n국제선은 최소 2~3시간 전 공항 도착 권장!'
       },
       {
         keys: ['공항','이동','메트로','지하철','교통','어떻게 가','타고','버스','기차'],
@@ -1657,7 +1747,7 @@
       },
       {
         keys: ['일정','스케줄','전체','요약','계획','며칠','기간'],
-        a: '🗓️ 전체 일정 요약:\n\n• 9/24 목 — 바르셀로나 도착(혼자)\n• 9/25 금 — 웅희 합류, 고딕지구\n• 9/26 토 — 가우디 데이\n• 9/27 일 — 시체스 해변\n• 9/28 일 — 16:45 포르투行\n• 9/29 월 — 도루밸리\n• 9/30 화 — 렐루서점+시내\n• 10/1 수 — 바르셀로나 복귀+사그라다\n• 10/2 목 — 13:00 시애틀行'
+        a: '🗓️ 전체 일정 요약:\n\n• 9/24 목 — 바르셀로나 도착(혼자)\n• 9/25 금 — 웅희 합류, 가우디+구시가지\n• 9/26 토 — 몬세라트\n• 9/27 일 — 시체스+몬주익\n• 9/28 일 — 16:45 포르투行\n• 9/29 월 — 도루밸리\n• 9/30 화 — 렐루서점+WOW\n• 10/1 수 — 바르셀로나 복귀+사그라다\n• 10/2 목 — 바르셀로나 여유(해변·전망대)\n• 10/3 금 — 근교 or 시내 마무리\n• 10/4 토 — 시애틀行 (출국)'
       }
     ];
 
